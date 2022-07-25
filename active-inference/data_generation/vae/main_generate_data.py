@@ -6,7 +6,7 @@ from unity.environment import UnityContainer
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device =", device)
 
-editor_mode = 1
+editor_mode = 0
 data_id = "s2nr"
 
 data_gen = DataGeneration()

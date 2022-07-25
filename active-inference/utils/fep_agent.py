@@ -3,9 +3,9 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utils.csv_logger import CSVLogger
-from utils.live_plot import LivePlot
-from utils.functions import min_max_norm_dr, add_gaussian_noise
+from .csv_logger import CSVLogger
+from .live_plot import LivePlot
+from .functions import min_max_norm_dr, add_gaussian_noise
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -236,7 +236,7 @@ class FepAgent:
         self.a_e_tracker.append(self.a[0, 1])
         """/tracking"""
 
-    def run_simulation(self, log_id: str, n_iterations: int):
+    def run_simulation(self, log_id: str, log_path: str, n_iterations: int, live_plot: bool = True):
         """
         Run a simulation by iteratively performing updating steps
         :param log_id: file identifier that will be used to write operation_logs to.
@@ -244,11 +244,12 @@ class FepAgent:
         :param n_iterations: number of iteration to run the simulation for
         """
         if log_id is not None:
-            csv_logger = CSVLogger(log_id)
+            csv_logger = CSVLogger(log_id, log_path)
             csv_logger.write_header(self)
 
         # Initialise live plot
-        plot = LivePlot(3, 2)
+        if live_plot:
+            plot = LivePlot(3, 2)
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
@@ -261,7 +262,8 @@ class FepAgent:
             self.active_inference_step()
 
             if i % self.plot_interval == 0:
-                plot.update_live_plot(self)
+                if live_plot:
+                    plot.update_live_plot(self)
             if i % 10 == 0:
                 print("Iteration", i, "action:", self.a, "belief", self.mu, "GT", self.s_p, "Ev attr",
                       self.attr_error_tracker)

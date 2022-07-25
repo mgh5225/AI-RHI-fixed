@@ -1,16 +1,17 @@
 import numpy as np
+import os
 
 from utils.csv_logger import CSVLogger
-from .fep_agent import FepAgent
+from utils.fep_agent import FepAgent
 from models.vae import VAE_CNN
 from unity.enums import *
 from unity.environment import UnityContainer
 
 
-editor_mode = True
+editor_mode = 0
 model_id = "vae"
 log_id = "test"
-n_sessions = 2
+log_path = os.path.join(os.path.dirname(__file__), "operation_logs/")
 
 
 def reaching_tasks(model, position_import_model_id=None):
@@ -57,7 +58,7 @@ def reaching_tasks(model, position_import_model_id=None):
                                enable_action=True, attractor_image=attr_image)
             log_id = ids[c] + str(central.sp_noise_variance) + "n" + str(i)
 
-            central.run_simulation(log_id, n_iterations)
+            central.run_simulation(log_id, log_path, n_iterations)
             unity.close()
 
 
@@ -77,7 +78,7 @@ def rhi_task(condition, stimulation):
                          model_id + "/data_range" + model_id + ".npy")
     central = FepAgent(unity, visual_decoder, data_range, enable_action=False)
 
-    central.run_simulation(log_id, n_iterations)
+    central.run_simulation(log_id, log_path, n_iterations)
     unity.close()
 
 

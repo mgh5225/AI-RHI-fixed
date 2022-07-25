@@ -3,7 +3,7 @@ import csv
 import numpy as np
 import pandas as pd
 
-from .functions import forward_kinematics
+from utils.functions import forward_kinematics
 
 
 class CSVLogger:
@@ -11,12 +11,13 @@ class CSVLogger:
     Class containing the functions used by the FepAgent class to log hyperparameters and iteration data to a CSV file
     """
 
-    def __init__(self, log_id):
+    def __init__(self, log_id, path):
         """
         Initialise the CSV logger
         :param log_id: name of the log file (the file will be saved at /model_operation/operation_logs/[log_id].csv)
         """
         self.log_id = log_id
+        self.path = path
 
     def write_header(self, fep_agent):
         """
@@ -24,7 +25,7 @@ class CSVLogger:
         iteration data
         :param fep_agent: FepAgent object to write the header for
         """
-        with open('./model_operation/operation_logs/' + self.log_id + '.csv', mode='w', newline='') as csvfile:
+        with open(self.path + self.log_id + '.csv', mode='w', newline='') as csvfile:
             filewriter = csv.writer(
                 csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow(['sigma_v_mu', 'sigma_v_a', 'sigma_p', 'sigma_mu', 'attractor_active', 'beta',
@@ -42,7 +43,7 @@ class CSVLogger:
         :param fep_agent: fep_agent to write the iteration state for
         :param i: current iteration index
         """
-        with open('./model_operation/operation_logs/' + self.log_id + '.csv', mode='a', newline='') as csvfile:
+        with open(self.path + self.log_id + '.csv', mode='a', newline='') as csvfile:
             filewriter = csv.writer(
                 csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             filewriter.writerow([i, fep_agent.a[0, 0], fep_agent.a[0, 1], fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
@@ -55,7 +56,7 @@ class CSVLogger:
                 fep_agent.env.get_rubber_joint_observation()[0, 1]])
 
     @staticmethod
-    def import_log(log_id, n, length, columns):
+    def import_log(path, log_id, n, length, columns):
         """
         Import CSV operation_logs of multiple runs into a numpy array
         :param log_id: log id of the operation_logs to import (files need to have format log_id[I_RUN].csv
@@ -68,8 +69,7 @@ class CSVLogger:
         data = np.zeros((n, length, len(columns)))
 
         for i in range(n):
-            df = pd.read_csv('./model_operation/operation_logs/' +
-                             log_id + str(i) + '.csv', header=2)
+            df = pd.read_csv(path + log_id + str(i) + '.csv', header=2)
             loaded_data = []
             for column in columns:
                 if df[column].dtype != 'float64':
@@ -82,7 +82,7 @@ class CSVLogger:
         return data
 
     @staticmethod
-    def get_rhi_data(model, n, length, variable):
+    def get_rhi_data(path, model, n, length, variable):
         """
         Easy import function for the RHI data that takes into account name formatting
         :param model: model name
@@ -99,8 +99,8 @@ class CSVLogger:
         data = np.zeros((3, 2, 3, n, length))
         for i_c in range(len(conditions)):
             for i_s in range(len(stimulation_types)):
-                imported_data = CSVLogger.import_log(log_id="rhi_results/" + model + conditions[i_c] + "rhi" +
-                                                            stimulation_types[i_s] + "0n", n=5, length=length,
+                imported_data = CSVLogger.import_log(path=path, log_id="rhi_results/" + model + conditions[i_c] + "rhi" +
+                                                     stimulation_types[i_s] + "0n", n=5, length=length,
                                                      columns=[variable+"_Shoulder", variable+"_Elbow"])
                 data[i_c, i_s, :2] = np.transpose(imported_data, (2, 0, 1))
                 data[i_c, i_s, 2] = forward_kinematics(

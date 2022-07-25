@@ -16,8 +16,8 @@ class UnityContainer:
     VECTOR_OBSERVATIONS_INDEX = 1
 
     # Path of the pre-build environment
-    BUILD_PATH = os.path.join(os.path.dirname(__file__),
-                              "../../Unity Environment/build/deep active inference agent environment")
+    BUILD_PATH = os.path.join(
+        os.path.dirname(__file__), "../../RHI Agent/Builds/env.x86_64")
 
     def __init__(self, use_editor, time_scale=1):
         """
