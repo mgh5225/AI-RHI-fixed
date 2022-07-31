@@ -18,7 +18,7 @@ unity = UnityContainer(editor_mode)
 unity.initialise_environment()
 
 # Left
-data_id = "left"
+data_id = "left0"
 
 unity.set_condition(Condition.Left)
 unity.set_stimulation(Stimulation.Asynchronous)
@@ -29,7 +29,7 @@ unity.reset()
 data_gen.generate_data(unity, data_id)
 
 # Center
-data_id = "center"
+data_id = "center0"
 
 unity.set_condition(Condition.Center)
 unity.set_stimulation(Stimulation.Asynchronous)
@@ -40,7 +40,7 @@ unity.reset()
 data_gen.generate_data(unity, data_id)
 
 # Right
-data_id = "right"
+data_id = "right0"
 
 unity.set_condition(Condition.Right)
 unity.set_stimulation(Stimulation.Asynchronous)

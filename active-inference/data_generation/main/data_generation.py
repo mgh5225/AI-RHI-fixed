@@ -4,8 +4,6 @@ import os
 from utils.csv_logger import CSVLogger
 from utils.fep_agent import FepAgent
 from models.vae import VAE_CNN
-from unity.enums import *
-from unity.environment import UnityContainer
 
 
 class DataGeneration:
@@ -23,3 +21,13 @@ class DataGeneration:
                          self.data_range, enable_action=False)
         agent.run_simulation(save_id, self.OUTPUT_PATH,
                              self.n_iterations, False)
+
+    def load_data(self, data_id):
+        return CSVLogger.import_log(path=self.OUTPUT_PATH,
+                                    log_id=data_id, n=1,
+                                    length=self.n_iterations,
+                                    columns=['A_Shoulder', 'A_Elbow',
+                                             'A_dot_Shoulder', 'A_dot_Elbow',
+                                             'mu_Shoulder', 'mu_Elbow',
+                                             'sp_Shoulder', 'sp_Elbow',
+                                             'cartesian_distance'])
