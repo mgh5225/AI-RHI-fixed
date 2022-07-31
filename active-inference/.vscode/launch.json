@@ -10,11 +10,19 @@
             "request": "launch",
             "module": "model_operation.main_inference",
             "justMyCode": true
-        },        {
+        },
+        {
             "name": "Generate Data",
             "type": "python",
             "request": "launch",
             "module": "data_generation.main.main_generate_data",
+            "justMyCode": true
+        },
+        {
+            "name": "Train MLP",
+            "type": "python",
+            "request": "launch",
+            "module": "model_training.main.main_train",
             "justMyCode": true
         }
     ]

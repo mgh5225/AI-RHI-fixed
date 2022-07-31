@@ -63,7 +63,7 @@ class CSVLogger:
                        where [I_RUN] is an integer denoting the run number (starting at 0).
         :param n: number of runs to import
         :param length: length of the runs (needs to be the same for each run)
-        :param columns: list containing the names of the colums to import
+        :param columns: list containing the names of the columns to import
         :return: numpy array of shape (n, length, len(columns))
         """
         data = np.zeros((n, length, len(columns)))
