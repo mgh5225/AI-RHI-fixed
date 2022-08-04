@@ -1,5 +1,4 @@
 import os
-from typing_extensions import Self
 import torch
 from torch import nn, optim
 from torch.optim.lr_scheduler import StepLR
@@ -7,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+from utils.fep_agent import FepAgent
 from utils.functions import shuffle_unison
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -84,7 +83,8 @@ class MLP(nn.Module):
                     cur_val_loss = np.append(cur_val_loss, [loss])
                 val_loss = np.append(val_loss, [np.mean(cur_val_loss)])
 
-                print('------ Epoch ', epoch, '--------LR:', scheduler.get_last_lr())
+                print('------ Epoch ', epoch, '--------LR:',
+                      scheduler.get_last_lr())
                 print('Epoch loss:', epoch_loss[-1])
                 print('Val loss:', val_loss[-1])
                 torch.save(net.state_dict(),
@@ -129,3 +129,11 @@ class MLP(nn.Module):
         self.load_state_dict(torch.load(os.path.join(
             self.SAVE_PATH, model_id+"/trained_network"+model_id)))
         self.eval()
+
+    def predict_y(self, fep_agent: FepAgent):
+        x = torch.Tensor([fep_agent.a[0, 0], fep_agent.a[0, 1],
+                          fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
+                          fep_agent.mu[0, 0], fep_agent.mu[0, 1],
+                          fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
+                          fep_agent.env.get_cartesian_distance(), ])
+        return self.forward(x)
