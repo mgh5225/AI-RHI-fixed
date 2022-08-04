@@ -84,7 +84,7 @@ class MLP(nn.Module):
                     cur_val_loss = np.append(cur_val_loss, [loss])
                 val_loss = np.append(val_loss, [np.mean(cur_val_loss)])
 
-                print('------ Epoch ', epoch, '--------LR:', scheduler.get_lr())
+                print('------ Epoch ', epoch, '--------LR:', scheduler.get_last_lr())
                 print('Epoch loss:', epoch_loss[-1])
                 print('Val loss:', val_loss[-1])
                 torch.save(net.state_dict(),
