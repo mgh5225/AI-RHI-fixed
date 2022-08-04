@@ -30,3 +30,15 @@ class Dataset:
 
     def get(self):
         return self.dataset[:, :-1], self.dataset[:, -1:]
+
+    def get_with_min_max_norm(self):
+        x = self.dataset[:, :-1]
+
+        max_x = np.max(x)
+        min_x = np.min(x)
+
+        y = self.dataset[:, -1:]
+
+        x = (x - min_x)/(max_x - min_x)
+
+        return x, y

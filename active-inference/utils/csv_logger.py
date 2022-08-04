@@ -46,10 +46,12 @@ class CSVLogger:
         with open(self.path + self.log_id + '.csv', mode='a', newline='') as csvfile:
             filewriter = csv.writer(
                 csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            filewriter.writerow([i, fep_agent.a[0, 0], fep_agent.a[0, 1], fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
-                                 fep_agent.mu[0, 0], fep_agent.mu[0,
-                                                                  1], fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
-                                 fep_agent.attr_error_tracker, fep_agent.gamma, fep_agent.last_tv, fep_agent.last_tt,
+            filewriter.writerow([i, fep_agent.a[0, 0], fep_agent.a[0, 1],
+                                 fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
+                                 fep_agent.mu[0, 0], fep_agent.mu[0, 1],
+                                 fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
+                                 fep_agent.attr_error_tracker, fep_agent.gamma,
+                                 fep_agent.last_tv, fep_agent.last_tt,
                                  fep_agent.env.get_cartesian_distance(),
                                  fep_agent.env.get_rubber_joint_observation()[
                 0, 0],
