@@ -3,7 +3,7 @@ import os
 import numpy as np
 from mlagents_envs.environment import UnityEnvironment, ActionTuple
 from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
-from mlagents_envs.side_channel.float_properties_channel import FloatPropertiesChannel
+from mlagents_envs.side_channel.environment_parameters_channel import EnvironmentParametersChannel
 
 from .enums import *
 
@@ -32,16 +32,16 @@ class UnityContainer:
             self.env_path = self.BUILD_PATH
         self.time_scale = time_scale
         self.env = None
-        self.float_properties_channel = None
+        self.env_params_channel = None
         self.behavior_name = None
         self.spec = None
 
     def initialise_environment(self):
         """Initialise and reset unity environment"""
         engine_configuration_channel = EngineConfigurationChannel()
-        self.float_properties_channel = FloatPropertiesChannel()
+        self.env_params_channel = EnvironmentParametersChannel()
         self.env = UnityEnvironment(file_name=self.env_path, base_port=5004,
-                                    side_channels=[engine_configuration_channel, self.float_properties_channel])
+                                    side_channels=[engine_configuration_channel, self.env_params_channel])
 
         # Reset the environment
         self.env.reset()
@@ -56,17 +56,17 @@ class UnityContainer:
 
     def set_condition(self, condition: Condition):
         """Sets the experimental condition setting"""
-        self.float_properties_channel.set_property(
+        self.env_params_channel.set_float_parameter(
             "condition", condition.value)
 
     def set_visible_arm(self, visible_arm: VisibleArm):
         """Sets the visible arm setting"""
-        self.float_properties_channel.set_property(
+        self.env_params_channel.set_float_parameter(
             "visiblearm", visible_arm.value)
 
     def set_stimulation(self, stimulation: Stimulation):
         """Sets the stimulation setting"""
-        self.float_properties_channel.set_property(
+        self.env_params_channel.set_float_parameter(
             "stimulation", stimulation.value)
 
     def get_joint_observation(self):
