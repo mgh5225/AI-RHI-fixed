@@ -17,7 +17,7 @@ class UnityContainer:
 
     # Path of the pre-build environment
     BUILD_PATH = os.path.join(
-        os.path.dirname(__file__), "../../RHI Agent/Builds/env.x86_64")
+        os.path.dirname(__file__), "../../RHI-Agent/Builds/env.x86_64")
 
     def __init__(self, use_editor, time_scale=1):
         """
