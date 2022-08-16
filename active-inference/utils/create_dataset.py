@@ -1,10 +1,14 @@
 import numpy as np
 import operator
+import torch
+from torch.utils.data import Dataset as TDataset
 
 from data_generation.main.data_generation import DataGeneration
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class Dataset:
+
+class Dataset(TDataset):
     def __init__(self, model_id: str, dict_data_id: dict):
         self.model_id = model_id
         self.dict_data_id = dict_data_id
@@ -28,17 +32,13 @@ class Dataset:
             else:
                 self.dataset = np.concatenate((self.dataset, Xy), axis=0)
 
-    def get(self):
-        return self.dataset[:, :-1], self.dataset[:, -1:]
+        self.dataset = torch.from_numpy(self.dataset).to(device)
 
-    def get_with_min_max_norm(self):
-        x = self.dataset[:, :-1]
+    def get_shape(self):
+        return self.dataset[:, :-1].shape[-1], self.dataset[:, -1:].shape[-1]
 
-        max_x = np.max(x)
-        min_x = np.min(x)
+    def __len__(self):
+        return len(self.dataset[:, -1:])
 
-        y = self.dataset[:, -1:]
-
-        x = (x - min_x)/(max_x - min_x)
-
-        return x, y
+    def __getitem__(self, idx):
+        return self.dataset[idx, :-1], self.dataset[idx, -1:]
