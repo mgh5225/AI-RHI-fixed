@@ -11,7 +11,7 @@ from unity.environment import UnityContainer
 
 editor_mode = 0
 model_id = "vae"
-network_id = "mlp_with_min_max"
+network_id = "mlp"
 log_id = "test"
 log_path = os.path.join(os.path.dirname(__file__), "operation_logs/")
 
@@ -88,7 +88,7 @@ def full_rhi_task(condition, stimulation):
     n_iterations = 1000
     input_size = 9
     output_size = 1
-    hidden_layers = [10, 15, 10]
+    hidden_layers = [2048, 1024, 512, 256, 128, 64]
 
     unity = UnityContainer(editor_mode)
     unity.initialise_environment()
@@ -118,4 +118,4 @@ def full_rhi_task(condition, stimulation):
 
 # Example RHI task
 # rhi_task(Condition.Left, Stimulation.Asynchronous)
-full_rhi_task(Condition.Center, Stimulation.Asynchronous)
+full_rhi_task(Condition.Right, Stimulation.Asynchronous)
