@@ -10,7 +10,7 @@ print("Device =", device)
 
 model_id = "vae"
 network_id = "mlp"
-dict_data_id = {"center": 1, "left": 0, }
+dict_data_id = {"center": 1,  "right": 0, "left": 0}
 
 dataset = Dataset(model_id, dict_data_id)
 dataset.create()

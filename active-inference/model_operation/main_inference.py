@@ -86,7 +86,7 @@ def rhi_task(condition, stimulation):
 
 def full_rhi_task(condition, stimulation):
     n_iterations = 1000
-    input_size = 9
+    input_size = 6
     output_size = 1
     hidden_layers = [2048, 1024, 512, 256, 128, 64]
 

@@ -28,6 +28,4 @@ class DataGeneration:
                                     length=self.n_iterations,
                                     columns=['A_Shoulder', 'A_Elbow',
                                              'A_dot_Shoulder', 'A_dot_Elbow',
-                                             'mu_Shoulder', 'mu_Elbow',
-                                             'sp_Shoulder', 'sp_Elbow',
-                                             'cartesian_distance'])
+                                             'mu_Shoulder', 'mu_Elbow', ])

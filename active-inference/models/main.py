@@ -19,6 +19,11 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
 
         hidden = []
+        active_fn = nn.Sigmoid()
+
+        if output_size > 1:
+            active_fn = nn.Softmax()
+
         for i in range(1, len(hidden_layers)):
             hidden.append(nn.Linear(hidden_layers[i-1], hidden_layers[i]))
             hidden.append(nn.BatchNorm1d(hidden_layers[i]))
@@ -27,7 +32,7 @@ class MLP(nn.Module):
         if len(hidden_layers) == 0:
             self.layers = nn.Sequential(
                 nn.Linear(input_size, output_size),
-                nn.Sigmoid()
+                active_fn
             )
         else:
             self.layers = nn.Sequential(
@@ -36,7 +41,7 @@ class MLP(nn.Module):
                 nn.LeakyReLU(),
                 *hidden,
                 nn.Linear(hidden_layers[-1], output_size),
-                nn.Sigmoid()
+                active_fn
             )
 
         self.to(device)
@@ -131,7 +136,5 @@ class MLP(nn.Module):
     def predict_y(self, fep_agent: FepAgent):
         x = torch.Tensor([fep_agent.a[0, 0], fep_agent.a[0, 1],
                           fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
-                          fep_agent.mu[0, 0], fep_agent.mu[0, 1],
-                          fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
-                          fep_agent.env.get_cartesian_distance(), ]).double().unsqueeze(0)
+                          fep_agent.mu[0, 0], fep_agent.mu[0, 1], ]).double().unsqueeze(0)
         return self.forward(x)
