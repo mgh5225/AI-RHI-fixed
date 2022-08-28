@@ -12,10 +12,17 @@
             "justMyCode": true
         },
         {
-            "name": "Generate Data",
+            "name": "Generate Data MLP",
             "type": "python",
             "request": "launch",
             "module": "data_generation.main.main_generate_data",
+            "justMyCode": true
+        },
+        {
+            "name": "Generate Data VAE",
+            "type": "python",
+            "request": "launch",
+            "module": "data_generation.vae.main_generate_data",
             "justMyCode": true
         },
         {
@@ -23,6 +30,13 @@
             "type": "python",
             "request": "launch",
             "module": "model_training.main.main_train",
+            "justMyCode": true
+        },
+        {
+            "name": "Train VAE",
+            "type": "python",
+            "request": "launch",
+            "module": "model_training.vae.main_train",
             "justMyCode": true
         }
     ]
