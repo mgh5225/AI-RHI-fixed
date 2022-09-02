@@ -44,7 +44,7 @@ class FepAgent:
 
         # Initialise Actuator Model
         self.actuator_model = actuator_model
-        self.actuator_labels = torch.tensor([])
+        self.actuator_labels = torch.tensor([], device=device)
 
         # Initialise belief vector
         self.mu = np.zeros((1, self.N_JOINTS))
@@ -269,16 +269,20 @@ class FepAgent:
 
             self.active_inference_step()
 
+            actuator_label = -1
+
             if self.actuator_model is not None:
+                actuator_label = self.actuator_model.predict_y(
+                    self).squeeze(dim=1)
                 self.actuator_labels = torch.cat(
-                    (self.actuator_labels, self.actuator_model.predict_y(self)))
+                    (self.actuator_labels, actuator_label))
 
             if i % self.plot_interval == 0:
                 if live_plot:
                     plot.update_live_plot(self)
             if i % 10 == 0:
                 print("Iteration", i, "action:", self.a, "belief", self.mu, "GT", self.s_p, "Ev attr",
-                      self.attr_error_tracker)
+                      self.attr_error_tracker, "Actuator Label", actuator_label.cpu().data.numpy())
             if log_id is not None:
                 csv_logger.write_iteration(self, i)
 

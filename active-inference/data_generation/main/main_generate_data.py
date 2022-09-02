@@ -10,7 +10,7 @@ print("Device =", device)
 
 editor_mode = 0
 model_id = "vae"
-with_label = False
+with_label = True
 
 data_gen = DataGeneration(model_id, with_label)
 
