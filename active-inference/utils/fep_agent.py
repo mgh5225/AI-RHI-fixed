@@ -7,6 +7,10 @@ from .csv_logger import CSVLogger
 from .live_plot import LivePlot
 from .functions import min_max_norm_dr, add_gaussian_noise
 
+from models.main import MLP
+from models.vae import VAE_CNN
+from unity.environment import UnityEnvironment
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -25,7 +29,7 @@ class FepAgent:
     IMG_WIDTH = 256
     IMG_HEIGHT = 256
 
-    def __init__(self, environment, visual_decoder, data_range, enable_action, attractor_image=None):
+    def __init__(self, environment: UnityEnvironment, visual_decoder: VAE_CNN, data_range, enable_action: bool, attractor_image=None, actuator_model: MLP = None):
         """
         Initialise the agent
         :param environment: environment the agent resides in
@@ -37,6 +41,10 @@ class FepAgent:
         self.visual_decoder = visual_decoder
         self.data_range = data_range
         self.action_enabled = enable_action
+
+        # Initialise Actuator Model
+        self.actuator_model = actuator_model
+        self.actuator_labels = torch.tensor([])
 
         # Initialise belief vector
         self.mu = np.zeros((1, self.N_JOINTS))
@@ -260,6 +268,10 @@ class FepAgent:
             self.gamma_tracker.append(self.gamma)
 
             self.active_inference_step()
+
+            if self.actuator_model is not None:
+                self.actuator_labels = torch.cat(
+                    (self.actuator_labels, self.actuator_model.predict_y(self)))
 
             if i % self.plot_interval == 0:
                 if live_plot:

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 
+from utils import configs
 from utils.csv_logger import CSVLogger
 from utils.fep_agent import FepAgent
 from models.main import MLP
@@ -11,7 +12,7 @@ from unity.environment import UnityContainer
 
 editor_mode = 0
 model_id = "vae"
-network_id = "mlp"
+
 log_id = "test"
 log_path = os.path.join(os.path.dirname(__file__), "operation_logs/")
 
@@ -85,10 +86,9 @@ def rhi_task(condition, stimulation):
 
 
 def full_rhi_task(condition, stimulation):
-    n_iterations = 1000
-    input_size = 6
-    output_size = 1
-    hidden_layers = [2048, 1024, 512, 256, 128, 64]
+    n_iterations = 1
+
+    mlp_configs = configs.mlp_configs
 
     unity = UnityContainer(editor_mode)
     unity.initialise_environment()
@@ -96,8 +96,9 @@ def full_rhi_task(condition, stimulation):
     visual_decoder = VAE_CNN()
     visual_decoder.load_from_file(model_id)
 
-    mlp = MLP(input_size, output_size, hidden_layers)
-    mlp.load_model(network_id)
+    mlp = MLP(mlp_configs.input_size, mlp_configs.output_size,
+              mlp_configs.hidden_layers)
+    mlp.load_model(mlp_configs.name)
 
     unity.set_condition(condition)
     unity.set_stimulation(stimulation)

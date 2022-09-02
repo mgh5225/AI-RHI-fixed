@@ -10,8 +10,9 @@ print("Device =", device)
 
 editor_mode = 0
 model_id = "vae"
+with_label = False
 
-data_gen = DataGeneration(model_id)
+data_gen = DataGeneration(model_id, with_label)
 
 # Initialise Unity environment
 unity = UnityContainer(editor_mode)

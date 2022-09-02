@@ -1,4 +1,3 @@
-from utils.fep_agent import FepAgent
 import os
 import torch
 from torch import nn, optim
@@ -133,7 +132,7 @@ class MLP(nn.Module):
         self.eval()
         self.double()
 
-    def predict_y(self, fep_agent: FepAgent):
+    def predict_y(self, fep_agent):
         x = torch.Tensor([fep_agent.a[0, 0], fep_agent.a[0, 1],
                           fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
                           fep_agent.mu[0, 0], fep_agent.mu[0, 1], ]).double().unsqueeze(0)
