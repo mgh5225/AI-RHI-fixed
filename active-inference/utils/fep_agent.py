@@ -29,7 +29,7 @@ class FepAgent:
     IMG_WIDTH = 256
     IMG_HEIGHT = 256
 
-    def __init__(self, environment: UnityEnvironment, visual_decoder: VAE_CNN, data_range, enable_action: bool, attractor_image=None, actuator_model: MLP = None):
+    def __init__(self, environment: UnityEnvironment, visual_decoder: VAE_CNN, data_range, enable_action: bool, attractor_image=None):
         """
         Initialise the agent
         :param environment: environment the agent resides in
@@ -41,10 +41,6 @@ class FepAgent:
         self.visual_decoder = visual_decoder
         self.data_range = data_range
         self.action_enabled = enable_action
-
-        # Initialise Actuator Model
-        self.actuator_model = actuator_model
-        self.actuator_labels = torch.tensor([], device=device)
 
         # Initialise belief vector
         self.mu = np.zeros((1, self.N_JOINTS))
@@ -269,20 +265,12 @@ class FepAgent:
 
             self.active_inference_step()
 
-            actuator_label = -1
-
-            if self.actuator_model is not None:
-                actuator_label = self.actuator_model.predict_y(
-                    self).squeeze(dim=1)
-                self.actuator_labels = torch.cat(
-                    (self.actuator_labels, actuator_label))
-
             if i % self.plot_interval == 0:
                 if live_plot:
                     plot.update_live_plot(self)
             if i % 10 == 0:
                 print("Iteration", i, "action:", self.a, "belief", self.mu, "GT", self.s_p, "Ev attr",
-                      self.attr_error_tracker, "Actuator Label", actuator_label.cpu().data.numpy())
+                      self.attr_error_tracker)
             if log_id is not None:
                 csv_logger.write_iteration(self, i)
 

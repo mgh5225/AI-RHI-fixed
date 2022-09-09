@@ -10,9 +10,8 @@ print("Device =", device)
 
 editor_mode = 0
 model_id = "vae"
-with_label = True
 
-data_gen = DataGeneration(model_id, with_label)
+data_gen = DataGeneration(model_id)
 
 # Initialise Unity environment
 unity = UnityContainer(editor_mode)
@@ -22,7 +21,7 @@ unity.initialise_environment()
 data_id = "left0"
 
 unity.set_condition(Condition.Left)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
@@ -33,7 +32,7 @@ data_gen.generate_data(unity, data_id)
 data_id = "center0"
 
 unity.set_condition(Condition.Center)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
@@ -44,7 +43,7 @@ data_gen.generate_data(unity, data_id)
 data_id = "right0"
 
 unity.set_condition(Condition.Right)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
