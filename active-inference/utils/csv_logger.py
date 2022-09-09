@@ -33,8 +33,10 @@ class CSVLogger:
             filewriter.writerow([fep_agent.sigma_v_mu, fep_agent.sigma_v_a, fep_agent.sigma_p, fep_agent.sigma_mu,
                                  fep_agent.attractor_active, fep_agent.gamma,
                                  fep_agent.sp_noise_variance])
-            filewriter.writerow(['Iteration', 'A_Shoulder', 'A_Elbow', 'A_dot_Shoulder', 'A_dot_Elbow', 'mu_Shoulder',
-                                 'mu_Elbow', 'sp_Shoulder', 'sp_Elbow', 'Ev attr', 'beta', 'last_vt', 'last_tt',
+            filewriter.writerow(['Iteration',
+                                 'A_Shoulder', 'A_Elbow', 'A_dot_Shoulder', 'A_dot_Elbow',
+                                 'mu_Shoulder', 'mu_Elbow', 'mu_dot_Shoulder', 'mu_dot_Elbow',
+                                 'sp_Shoulder', 'sp_Elbow', 'Ev attr', 'beta', 'last_vt', 'last_tt',
                                  'cartesian_distance', 'rubb_Shoulder', 'rubb_Elbow'])
 
     def write_iteration(self, fep_agent, i):
@@ -46,16 +48,21 @@ class CSVLogger:
         with open(self.path + self.log_id + '.csv', mode='a', newline='') as csvfile:
             filewriter = csv.writer(
                 csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            filewriter.writerow([i, fep_agent.a[0, 0], fep_agent.a[0, 1],
-                                 fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
-                                 fep_agent.mu[0, 0], fep_agent.mu[0, 1],
-                                 fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
-                                 fep_agent.attr_error_tracker, fep_agent.gamma,
-                                 fep_agent.last_tv, fep_agent.last_tt,
-                                 fep_agent.env.get_cartesian_distance(),
-                                 fep_agent.env.get_rubber_joint_observation()[
-                0, 0],
-                fep_agent.env.get_rubber_joint_observation()[0, 1]])
+            filewriter.writerow(
+                [
+                    i,
+                    fep_agent.a[0, 0], fep_agent.a[0, 1],
+                    fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
+                    fep_agent.mu[0, 0], fep_agent.mu[0, 1],
+                    fep_agent.mu_dot[0, 0], fep_agent.mu_dot[0, 1],
+                    fep_agent.s_p[0, 0], fep_agent.s_p[0, 1],
+                    fep_agent.attr_error_tracker,
+                    fep_agent.gamma,
+                    fep_agent.last_tv, fep_agent.last_tt,
+                    fep_agent.env.get_cartesian_distance(),
+                    fep_agent.env.get_rubber_joint_observation()[0, 0],
+                    fep_agent.env.get_rubber_joint_observation()[0, 1]
+                ])
 
     @staticmethod
     def import_log(path, log_id, n, length, columns):

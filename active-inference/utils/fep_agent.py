@@ -44,6 +44,7 @@ class FepAgent:
 
         # Initialise belief vector
         self.mu = np.zeros((1, self.N_JOINTS))
+        self.mu_dot = np.zeros((1, self.N_JOINTS))
 
         # Initialise action vector
         self.a = np.zeros((1, self.N_JOINTS))
@@ -214,15 +215,15 @@ class FepAgent:
 
         if self.attractor_active:
             # dF/dmu with attractor:
-            mu_dot = dF_dmu_vis + self.get_df_dmu_attr(inpt, output)
+            self.mu_dot = dF_dmu_vis + self.get_df_dmu_attr(inpt, output)
         else:
-            mu_dot = dF_dmu_vis
+            self.mu_dot = dF_dmu_vis
 
         # Proprioception
-        mu_dot += (1 / self.sigma_p) * (self.s_p - self.mu)
+        self.mu_dot += (1 / self.sigma_p) * (self.s_p - self.mu)
 
         # Update mu:
-        self.mu = self.mu + self.dt * mu_dot
+        self.mu = self.mu + self.dt * self.mu_dot
 
         # Compute the action:
         self.a_dot = np.zeros((1, 2))
