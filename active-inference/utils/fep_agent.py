@@ -1,3 +1,4 @@
+from statistics import mean
 from scipy.stats import norm
 import torch
 import numpy as np
@@ -29,7 +30,14 @@ class FepAgent:
     IMG_WIDTH = 256
     IMG_HEIGHT = 256
 
-    def __init__(self, environment: UnityEnvironment, visual_decoder: VAE_CNN, data_range, enable_action: bool, attractor_image=None):
+    # Minimum number of visuo-tactile stimulation to get illusion
+
+    def __init__(self,
+                 environment: UnityEnvironment,
+                 visual_decoder: VAE_CNN,
+                 data_range,
+                 enable_action: bool,
+                 attractor_image=None):
         """
         Initialise the agent
         :param environment: environment the agent resides in
@@ -104,6 +112,11 @@ class FepAgent:
         """Additional paramters"""
         self.plot_interval = 50
         """/Additional paramters"""
+
+        """Parameters for Illusion"""
+        self.min_diff_mu = 2*1e-5
+        self.illusion = torch.tensor([])
+        """/Parameters for Illusion"""
 
     def get_visual_forward(self, inpt):
         """
@@ -266,12 +279,33 @@ class FepAgent:
 
             self.active_inference_step()
 
+            if i > 0:
+
+                diff_mu_s = abs(self.mu_s_tracker[-1] - self.mu_s_tracker[-2])
+                diff_mu_e = abs(self.mu_e_tracker[-1] - self.mu_e_tracker[-2])
+
+                diff_mean_mu = mean([diff_mu_s, diff_mu_e])
+
+                if diff_mean_mu <= self.min_diff_mu:
+                    self.illusion = torch.cat(
+                        (self.illusion, torch.tensor([1])))
+                else:
+                    self.illusion = torch.cat(
+                        (self.illusion, torch.tensor([0])))
+            else:
+                self.illusion = torch.cat((self.illusion, torch.tensor([0])))
+
             if i % self.plot_interval == 0:
                 if live_plot:
                     plot.update_live_plot(self)
             if i % 10 == 0:
-                print("Iteration", i, "action:", self.a, "belief", self.mu, "GT", self.s_p, "Ev attr",
-                      self.attr_error_tracker)
+                print(
+                    "Iteration", i,
+                    "action:", self.a,
+                    "belief", self.mu,
+                    "GT", self.s_p,
+                    "Ev attr", self.attr_error_tracker,
+                    "Is Illusion", self.illusion[-1].item())
             if log_id is not None:
                 csv_logger.write_iteration(self, i)
 

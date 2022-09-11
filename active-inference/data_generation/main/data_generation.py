@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import torch
 
 from utils.csv_logger import CSVLogger
 from utils.fep_agent import FepAgent
@@ -22,6 +23,8 @@ class DataGeneration:
                          self.data_range, enable_action=False)
         agent.run_simulation(save_id, self.OUTPUT_PATH,
                              self.n_iterations, False)
+
+        torch.save(agent.illusion, self.OUTPUT_PATH+"/"+save_id+"_labels")
 
     def load_data(self, data_id):
         return CSVLogger.import_log(path=self.OUTPUT_PATH,
