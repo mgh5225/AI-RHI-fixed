@@ -18,9 +18,10 @@ class DataGeneration:
         self.data_range = np.load(self.visual_decoder.SAVE_PATH + "/" +
                                   model_id + "/data_range" + model_id + ".npy")
 
-    def generate_data(self, env, save_id):
+    def generate_data(self, env, save_id, min_iter_for_illusion):
         agent = FepAgent(env, self.visual_decoder,
-                         self.data_range, enable_action=False)
+                         self.data_range, enable_action=False,
+                         min_iter_for_illusion=min_iter_for_illusion)
         agent.run_simulation(save_id, self.OUTPUT_PATH,
                              self.n_iterations, False)
 
@@ -33,3 +34,7 @@ class DataGeneration:
                                     columns=['A_Shoulder', 'A_Elbow',
                                              'A_dot_Shoulder', 'A_dot_Elbow',
                                              'mu_Shoulder', 'mu_Elbow', ])
+
+    @staticmethod
+    def load_labels(data_id):
+        return torch.load(DataGeneration.OUTPUT_PATH+"/"+data_id+"0_labels")

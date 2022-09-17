@@ -8,7 +8,6 @@ from .csv_logger import CSVLogger
 from .live_plot import LivePlot
 from .functions import min_max_norm_dr, add_gaussian_noise
 
-from models.main import MLP
 from models.vae import VAE_CNN
 from unity.environment import UnityEnvironment
 
@@ -37,7 +36,8 @@ class FepAgent:
                  visual_decoder: VAE_CNN,
                  data_range,
                  enable_action: bool,
-                 attractor_image=None):
+                 attractor_image=None,
+                 min_iter_for_illusion=100):
         """
         Initialise the agent
         :param environment: environment the agent resides in
@@ -116,6 +116,7 @@ class FepAgent:
         """Parameters for Illusion"""
         self.min_diff_mu = 2*1e-5
         self.illusion = torch.tensor([])
+        self.min_iter_for_illusion = min_iter_for_illusion
         """/Parameters for Illusion"""
 
     def get_visual_forward(self, inpt):
@@ -279,7 +280,7 @@ class FepAgent:
 
             self.active_inference_step()
 
-            if i > 0:
+            if i > self.min_iter_for_illusion:
 
                 diff_mu_s = abs(self.mu_s_tracker[-1] - self.mu_s_tracker[-2])
                 diff_mu_e = abs(self.mu_e_tracker[-1] - self.mu_e_tracker[-2])
@@ -315,3 +316,15 @@ class FepAgent:
                 self.env.act(np.zeros((1, 2)))
 
         plt.close()
+
+    def get_mu_observation(self):
+        visual_observation = torch.from_numpy(
+            self.env.get_visual_observation()).to(device)
+        visual_observation = visual_observation.permute((2, 0, 1))
+
+        output = self.visual_decoder.encode(
+            visual_observation.unsqueeze(0))
+
+        o_mu = (output[0]).detach().cpu().numpy()
+
+        return o_mu

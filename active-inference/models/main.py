@@ -1,3 +1,4 @@
+from utils.fep_agent import FepAgent
 import os
 import torch
 from torch import nn, optim
@@ -5,7 +6,6 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader, random_split
 import numpy as np
 from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter()
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -55,6 +55,7 @@ class MLP(nn.Module):
     @staticmethod
     def train_model(net: nn.Module, dataset, network_id, max_epochs=600, batch_size=125):
         torch.cuda.empty_cache()
+        writer = SummaryWriter("runs/" + network_id)
 
         train_size = int(0.8 * len(dataset))
         test_size = len(dataset) - train_size
@@ -107,6 +108,8 @@ class MLP(nn.Module):
         torch.save(net.state_dict(),
                    MLP.SAVE_PATH + "/" + network_id + "/trained_network" + network_id)
 
+        writer.flush()
+
     @staticmethod
     def run_batch(input_x, target_y, train, net, optimizer):
         optimizer.zero_grad()
@@ -132,8 +135,21 @@ class MLP(nn.Module):
         self.eval()
         self.double()
 
-    def predict_y(self, fep_agent):
-        x = torch.Tensor([fep_agent.a[0, 0], fep_agent.a[0, 1],
-                          fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
-                          fep_agent.mu[0, 0], fep_agent.mu[0, 1], ]).double().unsqueeze(0)
-        return self.forward(x)
+    def predict_y(self, fep_agent: FepAgent, with_mu=False):
+        if with_mu:
+            o_mu = fep_agent.get_mu_observation()
+
+            x = torch.Tensor([
+                fep_agent.a[0, 0], fep_agent.a[0, 1],
+                fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
+                fep_agent.mu[0, 0], fep_agent.mu[0, 1],
+                o_mu[0, 0], o_mu[0, 1]
+            ]).double().unsqueeze(0)
+            return self.forward(x)
+        else:
+            x = torch.Tensor([
+                fep_agent.a[0, 0], fep_agent.a[0, 1],
+                fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
+                fep_agent.mu[0, 0], fep_agent.mu[0, 1]
+            ]).double().unsqueeze(0)
+            return self.forward(x)

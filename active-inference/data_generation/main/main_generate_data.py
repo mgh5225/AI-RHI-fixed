@@ -21,34 +21,34 @@ unity.initialise_environment()
 data_id = "left0"
 
 unity.set_condition(Condition.Left)
-unity.set_stimulation(Stimulation.Synchronous)
+unity.set_stimulation(Stimulation.Asynchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
 # Generate and save the data
-data_gen.generate_data(unity, data_id)
+data_gen.generate_data(unity, data_id, 800)
 
 # Center
 data_id = "center0"
 
 unity.set_condition(Condition.Center)
-unity.set_stimulation(Stimulation.Synchronous)
+unity.set_stimulation(Stimulation.Asynchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
 # Generate and save the data
-data_gen.generate_data(unity, data_id)
+data_gen.generate_data(unity, data_id, 100)
 
 # Right
 data_id = "right0"
 
 unity.set_condition(Condition.Right)
-unity.set_stimulation(Stimulation.Synchronous)
+unity.set_stimulation(Stimulation.Asynchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
 # Generate and save the data
-data_gen.generate_data(unity, data_id)
+data_gen.generate_data(unity, data_id, 500)
 
 # Close the Unity environment
 unity.close()
