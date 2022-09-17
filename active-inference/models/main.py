@@ -5,6 +5,7 @@ from torch import nn, optim
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader, random_split
 import numpy as np
+from sklearn.metrics import confusion_matrix
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -83,17 +84,17 @@ class MLP(nn.Module):
             test_iter = iter(test_dataloader)
 
             for (x, y) in train_iter:
-                loss = MLP.run_batch(x, y, True, net, optimizer)
+                loss, _ = MLP.run_batch(x, y, True, net, optimizer)
                 cur_batch_loss = np.append(cur_batch_loss, [loss])
 
             scheduler.step()
 
             epoch_loss = np.append(epoch_loss, [np.mean(cur_batch_loss)])
 
-            if epoch % 10 == 0 and epoch < max_epochs - 1:
+            if epoch % 10 == 0 or epoch == (max_epochs - 1):
 
                 for (x, y) in test_iter:
-                    loss = MLP.run_batch(x, y, False, net, optimizer)
+                    loss, _ = MLP.run_batch(x, y, False, net, optimizer)
                     cur_val_loss = np.append(cur_val_loss, [loss])
                 val_loss = np.append(val_loss, [np.mean(cur_val_loss)])
 
@@ -110,6 +111,20 @@ class MLP(nn.Module):
 
         writer.flush()
 
+        y_true = []
+        y_pred = []
+
+        test_iter = iter(test_dataloader)
+
+        for (x, y) in test_iter:
+            _, yh = MLP.run_batch(x, y, False, net, optimizer)
+
+            y_true.extend(y.data.cpu().numpy())
+            y_pred.extend(torch.round(yh).data.cpu().numpy())
+
+        cf_matrix = confusion_matrix(y_true, y_pred)
+        print(cf_matrix)
+
     @staticmethod
     def run_batch(input_x, target_y, train, net, optimizer):
         optimizer.zero_grad()
@@ -120,7 +135,7 @@ class MLP(nn.Module):
             loss.backward()
             optimizer.step()
 
-        return loss.item()
+        return loss.item(), predict_y
 
     @staticmethod
     def loss_function(target_y, predict_y):
@@ -143,7 +158,7 @@ class MLP(nn.Module):
                 fep_agent.a[0, 0], fep_agent.a[0, 1],
                 fep_agent.a_dot[0, 0], fep_agent.a_dot[0, 1],
                 fep_agent.mu[0, 0], fep_agent.mu[0, 1],
-                o_mu[0, 0], o_mu[0, 1]
+                o_mu[0], o_mu[1]
             ]).double().unsqueeze(0)
             return self.forward(x)
         else:

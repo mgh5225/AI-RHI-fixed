@@ -40,11 +40,11 @@ def train_spatial_model():
 
 def train_temporal_model():
     network_id = "mlp_temporal"
-    stimulation = Stimulation.Asynchronous
+    stimulation = Stimulation.Synchronous
     dict_condition_id = {
-        "center": Condition.Center,
-        "right": Condition.Right,
-        "left": Condition.Left
+        "center_sync": Condition.Center,
+        "right_sync": Condition.Right,
+        "left_sync": Condition.Left
     }
 
     unity = UnityContainer(editor_mode)
@@ -67,7 +67,7 @@ def train_temporal_model():
 
     unity.close()
 
-    MLP.train_model(network, dataset, network_id, 500, 512)
+    MLP.train_model(network, dataset, network_id, 100, 512)
 
 
 # train_spatial_model()

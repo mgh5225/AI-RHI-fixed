@@ -18,10 +18,10 @@ unity = UnityContainer(editor_mode)
 unity.initialise_environment()
 
 # Left
-data_id = "left0"
+data_id = "left_sync0"
 
 unity.set_condition(Condition.Left)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
@@ -29,26 +29,26 @@ unity.reset()
 data_gen.generate_data(unity, data_id, 800)
 
 # Center
-data_id = "center0"
+data_id = "center_sync0"
 
 unity.set_condition(Condition.Center)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
 # Generate and save the data
-data_gen.generate_data(unity, data_id, 100)
+data_gen.generate_data(unity, data_id, 550)
 
 # Right
-data_id = "right0"
+data_id = "right_sync0"
 
 unity.set_condition(Condition.Right)
-unity.set_stimulation(Stimulation.Asynchronous)
+unity.set_stimulation(Stimulation.Synchronous)
 unity.set_visible_arm(VisibleArm.RubberArm)
 unity.reset()
 
 # Generate and save the data
-data_gen.generate_data(unity, data_id, 500)
+data_gen.generate_data(unity, data_id, 700)
 
 # Close the Unity environment
 unity.close()

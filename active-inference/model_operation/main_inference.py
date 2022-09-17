@@ -86,7 +86,7 @@ def rhi_task(condition, stimulation):
 
 
 def full_rhi_task(condition, stimulation, with_mu):
-    n_iterations = 500
+    n_iterations = 1500
 
     mlp_configs = configs.mlp_configs
 
@@ -119,5 +119,5 @@ def full_rhi_task(condition, stimulation, with_mu):
 
 # Example RHI task
 # rhi_task(Condition.Left, Stimulation.Asynchronous)
-full_rhi_task(Condition.Center, Stimulation.Asynchronous, True)
+full_rhi_task(Condition.Right, Stimulation.Synchronous, True)
 # full_rhi_task(Condition.Left, Stimulation.Asynchronous, False)

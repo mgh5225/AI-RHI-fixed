@@ -114,7 +114,7 @@ class FepAgent:
         """/Additional paramters"""
 
         """Parameters for Illusion"""
-        self.min_diff_mu = 2*1e-5
+        self.min_diff_mu = 5*1e-5
         self.illusion = torch.tensor([])
         self.min_iter_for_illusion = min_iter_for_illusion
         """/Parameters for Illusion"""
@@ -320,11 +320,12 @@ class FepAgent:
     def get_mu_observation(self):
         visual_observation = torch.from_numpy(
             self.env.get_visual_observation()).to(device)
+
         visual_observation = visual_observation.permute((2, 0, 1))
 
-        output = self.visual_decoder.encode(
+        output = self.visual_decoder.mu_prediction(
             visual_observation.unsqueeze(0))
 
-        o_mu = (output[0]).detach().cpu().numpy()
+        o_mu = (output[0]).data.cpu().numpy()
 
         return o_mu

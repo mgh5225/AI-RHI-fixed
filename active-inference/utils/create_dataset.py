@@ -47,16 +47,15 @@ class Dataset(TDataset):
 
                 visual_observation = visual_observation.permute((2, 0, 1))
 
-                with torch.no_grad():
-                    output = self.visual_decoder.encode(
-                        visual_observation.unsqueeze(0))
+                output = self.visual_decoder.mu_prediction(
+                    visual_observation.unsqueeze(0))
 
-                    o_mu = (output[0]).cpu().numpy()
+                o_mu = (output[0]).data.cpu().numpy()
 
-                    self.dict_data[data_id] = np.zeros(
-                        tuple(map(operator.add, X.shape, (0, o_mu.shape[1]+1))))
-                    self.dict_data[data_id][:, :-(1+o_mu.shape[1])] = X
-                    self.dict_data[data_id][:, X.shape[1]:-1] = o_mu
+                self.dict_data[data_id] = np.zeros(
+                    tuple(map(operator.add, X.shape, (0, o_mu.shape[0]+1))))
+                self.dict_data[data_id][:, :-(1+o_mu.shape[0])] = X
+                self.dict_data[data_id][:, X.shape[1]:-1] = o_mu
             else:
                 self.dict_data[data_id] = np.zeros(
                     tuple(map(operator.add, X.shape, (0, 1))))

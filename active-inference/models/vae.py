@@ -99,6 +99,11 @@ class VAE_CNN(nn.Module):
         """
         return self.decode(mu)
 
+    def mu_prediction(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        return z
+
     def decode(self, z):
         """
         Run the decoder (second part of the forward pass)
