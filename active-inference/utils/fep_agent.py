@@ -92,8 +92,12 @@ class FepAgent:
         """Parameter tracking lists"""
         self.mu_s_tracker = []
         self.mu_e_tracker = []
+        self.mu_dot_s_tracker = []
+        self.mu_dot_e_tracker = []
         self.a_s_tracker = []
         self.a_e_tracker = []
+        self.a_dot_s_tracker = []
+        self.a_dot_e_tracker = []
         self.vis_err_tracker = []
         self.attr_error_tracker = []
         self.gamma_tracker = []
@@ -253,6 +257,11 @@ class FepAgent:
         self.mu_e_tracker.append(self.mu[0, 1])
         self.a_s_tracker.append(self.a[0, 0])
         self.a_e_tracker.append(self.a[0, 1])
+
+        self.mu_dot_s_tracker.append(self.mu_dot[0, 0])
+        self.mu_dot_e_tracker.append(self.mu_dot[0, 1])
+        self.a_dot_s_tracker.append(self.a_dot[0, 0])
+        self.a_dot_e_tracker.append(self.a_dot[0, 1])
         """/tracking"""
 
     def run_simulation(self, log_id: str, log_path: str, n_iterations: int, live_plot: bool = True):

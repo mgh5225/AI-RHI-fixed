@@ -85,7 +85,7 @@ def rhi_task(condition, stimulation):
     unity.close()
 
 
-def full_rhi_task(condition, stimulation, with_mu):
+def full_rhi_task(condition, stimulation, with_mu, plot):
     n_iterations = 1500
 
     mlp_configs = configs.mlp_configs
@@ -111,13 +111,18 @@ def full_rhi_task(condition, stimulation, with_mu):
     agent = FepAgent(unity, visual_decoder, data_range, enable_action=False)
     agent.run_simulation(log_id, log_path, n_iterations)
 
-    yh = mlp.predict_y(agent, with_mu)
-    print("Predicted y: ", yh.item())
+    if plot:
+        mlp.plot_y(n_iterations, agent)
+    else:
+        yh = mlp.predict_y(agent, with_mu)
+        print("Predicted y: ", yh.item())
 
     unity.close()
 
 
 # Example RHI task
 # rhi_task(Condition.Left, Stimulation.Asynchronous)
-full_rhi_task(Condition.Right, Stimulation.Synchronous, True)
-# full_rhi_task(Condition.Left, Stimulation.Asynchronous, False)
+full_rhi_task(Condition.Left, Stimulation.Synchronous, True, True)
+full_rhi_task(Condition.Center, Stimulation.Synchronous, True, True)
+full_rhi_task(Condition.Right, Stimulation.Synchronous, True, True)
+# full_rhi_task(Condition.Left, Stimulation.Asynchronous, False,False)

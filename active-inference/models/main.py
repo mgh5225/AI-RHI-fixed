@@ -168,3 +168,21 @@ class MLP(nn.Module):
                 fep_agent.mu[0, 0], fep_agent.mu[0, 1]
             ]).double().unsqueeze(0)
             return self.forward(x)
+
+    def plot_y(self, steps, fep_agent: FepAgent):
+        writer = SummaryWriter("runs/yh")
+
+        o_mu = fep_agent.get_mu_observation()
+
+        for i in range(steps):
+            x = torch.Tensor([
+                fep_agent.a_s_tracker[i], fep_agent.a_e_tracker[i],
+                fep_agent.a_dot_s_tracker[i], fep_agent.a_dot_e_tracker[i],
+                fep_agent.mu_s_tracker[i], fep_agent.mu_e_tracker[i],
+                o_mu[0], o_mu[1]
+            ]).double().unsqueeze(0)
+
+            yh = self.forward(x)
+            writer.add_scalar("Predicted Y", yh, i)
+
+        writer.flush()
