@@ -3,21 +3,26 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - left_upper_arm
+  - left_elbow
+  - left_lower_arm
+  - eye_camera
+  - left_shoulder
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - L3
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - L6
+  - L7
+  - L8
+  - L9
+  - L10
+  - L11
+  - L12
   - 
   - 
   - 
