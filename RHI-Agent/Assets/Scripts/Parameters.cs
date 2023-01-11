@@ -44,6 +44,16 @@ public class Parameters : MonoBehaviour
         Python_configured
     }
 
+    /// <summary>
+    /// Which mode is used.
+    /// </summary>
+    public enum Mode
+    {
+        dataGeneration,
+        inference,
+        Python_configured
+    }
+
     [Tooltip("Experimental condition")]
     public Condition conditionSetMe;
 
@@ -53,11 +63,16 @@ public class Parameters : MonoBehaviour
     [Tooltip("Stimulation type")]
     public Stimulation stimulationSetMe;
 
+    [Tooltip("Mode type")]
+    public Mode modeSetMe;
+
     public Condition condition;
 
     public VisibleArm visibleArm;
 
     public Stimulation stimulation;
+
+    public Mode mode;
 
     private GameObject[] cameraObjects;
 
@@ -154,6 +169,20 @@ public class Parameters : MonoBehaviour
         else
         {
             stimulation = stimulationSetMe;
+        }
+    }
+
+
+    private void setMode()
+    {
+        if (modeSetMe == Mode.Python_configured)
+        {
+            // mode = (Mode)(int)Academy.Instance.FloatProperties.GetPropertyWithDefault("mode", 1f);
+            mode = (Mode)(int)Academy.Instance.EnvironmentParameters.GetWithDefault("mode", 1f);
+        }
+        else
+        {
+            mode = modeSetMe;
         }
     }
 }

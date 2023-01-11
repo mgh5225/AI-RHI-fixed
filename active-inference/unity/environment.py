@@ -69,6 +69,11 @@ class UnityContainer:
         self.env_params_channel.set_float_parameter(
             "stimulation", stimulation.value)
 
+    def set_mode(self, mode: Mode):
+        """Sets the mode setting"""
+        self.env_params_channel.set_float_parameter(
+            "mode", mode.value)
+
     def get_joint_observation(self):
         decision_steps, terminal_steps = self.env.get_steps(self.behavior_name)
         """:returns joint angles of the agent"""

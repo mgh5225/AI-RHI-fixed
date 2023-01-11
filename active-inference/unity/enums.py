@@ -27,3 +27,11 @@ class Stimulation(enum.Enum):
     """
     Synchronous = 0.0
     Asynchronous = 1.0
+
+
+class Mode(enum.Enum):
+    """
+    Enumeration used to configure the type of mode used
+    """
+    DataGeneration = 0.0
+    Inference = 1.0
