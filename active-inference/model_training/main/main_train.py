@@ -6,7 +6,7 @@ from models.main import MLP
 from models.vae import VAE_CNN
 from unity.enums import *
 from unity.environment import UnityContainer
-from utils.create_dataset import Dataset
+from utils.create_dataset import MainDataset
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device =", device)
@@ -23,7 +23,7 @@ def train_spatial_model():
         "left": 0
     }
 
-    dataset = Dataset(model_id, dict_illusion_id)
+    dataset = MainDataset(model_id, dict_illusion_id)
 
     dataset.create(False, False)
     dataset.merge()
@@ -53,8 +53,8 @@ def train_temporal_model():
     visual_decoder = VAE_CNN()
     visual_decoder.load_from_file(model_id)
 
-    dataset = Dataset(model_id, dict_condition_id,
-                      unity, visual_decoder, stimulation)
+    dataset = MainDataset(model_id, dict_condition_id,
+                          unity, visual_decoder, stimulation)
     dataset.create()
     dataset.merge()
 

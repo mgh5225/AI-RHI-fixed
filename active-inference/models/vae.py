@@ -4,10 +4,9 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 from torch.optim.lr_scheduler import StepLR
-from utils.functions import shuffle_unison
-from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader, random_split
 import numpy as np
-import matplotlib.pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -32,11 +31,11 @@ class VAE_CNN(nn.Module):
         self.e_fc3 = nn.Linear(1024, 512)
 
         # Variational latent variable layers
-        self.fc_mu = nn.Linear(512, 2)
-        self.fc_logvar = nn.Linear(512, 2)
+        self.fc_mu = nn.Linear(512, 3)
+        self.fc_logvar = nn.Linear(512, 3)
 
         # Decoder
-        self.d_fc1 = nn.Linear(2, 1024)
+        self.d_fc1 = nn.Linear(3, 1024)
         self.d_fc2 = nn.Linear(1024, 8 * 8 * 128)
 
         self.d_upconv1 = nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1)
@@ -57,6 +56,7 @@ class VAE_CNN(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
         self.to(device)
+        self.double()
 
     def encode(self, x):
         """
@@ -145,7 +145,7 @@ class VAE_CNN(nn.Module):
         return output, mu, logvar
 
     @staticmethod
-    def train_net(net, X, Y, network_id, max_epochs=600, batch_size=125):
+    def train_net(net: nn.Module, dataset, network_id, max_epochs=600, batch_size=125):
         """
         Train the neural network
         :param net: the network object
@@ -156,12 +156,19 @@ class VAE_CNN(nn.Module):
         :param batch_size: size of the mini-batches
         """
         torch.cuda.empty_cache()
+        writer = SummaryWriter("runs/" + network_id)
 
-        X_train, X_val, Y_train, Y_val = train_test_split(
-            X, Y, test_size=0.10, random_state=58)
+        train_size = int(0.8 * len(dataset))
+        test_size = len(dataset) - train_size
 
-        Y_train = Y_train[:, np.newaxis, :, :]
-        Y_val = Y_val[:, np.newaxis, :, :]
+        train_dataset, test_dataset = random_split(
+            dataset, [train_size, test_size])
+
+        train_dataloader = DataLoader(
+            train_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+
+        test_dataloader = DataLoader(
+            test_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
         optimizer = optim.Adam(net.parameters(), lr=0.001)  # 0.001
         scheduler = StepLR(optimizer, step_size=20, gamma=0.95)  # 0.95
@@ -169,63 +176,44 @@ class VAE_CNN(nn.Module):
         epoch_loss = []
         val_loss = []
 
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6))
-        plt.ion()
-        fig.show()
-        plt.pause(0.001)
-
         for epoch in range(max_epochs):
             cur_batch_loss = []
             cur_val_loss = []
-            x, y = shuffle_unison(X_train, Y_train)
-            for i in range(X_train.shape[0] // batch_size):
-                loss = VAE_CNN.run_batch(
-                    i, x, y, True, net, optimizer, batch_size)
+
+            train_iter = iter(train_dataloader)
+            test_iter = iter(test_dataloader)
+
+            for (x, y) in train_iter:
+                loss, _ = VAE_CNN.run_batch(x, y, True, net, optimizer)
                 cur_batch_loss = np.append(cur_batch_loss, [loss])
 
             scheduler.step()
 
             epoch_loss = np.append(epoch_loss, [np.mean(cur_batch_loss)])
 
-            if epoch % 10 == 0 and epoch < max_epochs - 1:
-                x, y = shuffle_unison(X_val, Y_val)
-                for i in range(X_val.shape[0]):
-                    loss = VAE_CNN.run_batch(i, x, y, False, net, optimizer, 1)
+            if epoch % 10 == 0 or epoch == (max_epochs - 1):
+
+                for (x, y) in test_iter:
+                    loss, _ = VAE_CNN.run_batch(x, y, False, net, optimizer)
                     cur_val_loss = np.append(cur_val_loss, [loss])
                 val_loss = np.append(val_loss, [np.mean(cur_val_loss)])
 
-                print('------ Epoch ', epoch, '--------LR:', scheduler.get_lr())
+                print('------ Epoch ', epoch, '-------- LR:',
+                      scheduler.get_last_lr())
                 print('Epoch loss:', epoch_loss[-1])
                 print('Val loss:', val_loss[-1])
-                torch.save(net.state_dict(),
-                           VAE_CNN.SAVE_PATH + "/" + network_id + "/trained_network" + network_id + str(
-                               epoch))
 
-                ax.set_title("Loss")
-                ax.set_yscale('log')
-                ax.plot(range(len(epoch_loss)), epoch_loss, label="Epoch loss")
-                ax.plot(np.arange(len(val_loss)) * 10,
-                        val_loss, label="Validation loss")
-                plt.pause(0.001)
+                writer.add_scalar("Loss/train", epoch_loss[-1], epoch)
+                writer.add_scalar("Loss/validation", val_loss[-1], epoch)
 
         torch.save(net.state_dict(),
                    VAE_CNN.SAVE_PATH + "/" + network_id + "/trained_network" + network_id + "final")
 
     @staticmethod
-    def run_batch(i, x, y, train, net, optimizer, batch_size):
-        """
-        Execute a training batch
-        """
-        q = torch.tensor(x[i * batch_size: (i + 1) * batch_size],
-                         dtype=torch.float, device=device)
-        input_y = torch.tensor(
-            y[i * batch_size: (i + 1) * batch_size], dtype=torch.float, device=device)
-        target_y = torch.tensor(y[i * batch_size: (i + 1) * batch_size], dtype=torch.float, device=device,
-                                requires_grad=False)
-
+    def run_batch(input_x, target_y, train, net, optimizer):
         optimizer.zero_grad()
-        predict_y, mu, logvar = net.forward(input_y)
-        loss = VAE_CNN.loss_function(target_y, predict_y, q, mu, logvar)
+        predict_y, mu, logvar = net.forward(target_y)
+        loss = VAE_CNN.loss_function(target_y, predict_y, input_x, mu, logvar)
 
         if train:
             loss.backward()

@@ -1,7 +1,7 @@
 import numpy as np
 import operator
 import torch
-from torch.utils.data import Dataset as TDataset
+from torch.utils.data import Dataset
 
 from data_generation.main.data_generation import DataGeneration
 from models.vae import VAE_CNN
@@ -12,7 +12,7 @@ from unity.environment import UnityContainer
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-class Dataset(TDataset):
+class MainDataset(Dataset):
 
     def __init__(
         self,
@@ -22,7 +22,7 @@ class Dataset(TDataset):
         visual_decoder: VAE_CNN = None,
         stimulation: Stimulation = None
     ):
-
+        super().__init__()
         self.model_id = model_id
         self.dict_id = dict_id
         self.dict_data = dict()
@@ -85,3 +85,16 @@ class Dataset(TDataset):
 
     def __getitem__(self, idx):
         return self.dataset[idx, :-1], self.dataset[idx, -1:]
+
+
+class VAEDataset(Dataset):
+    def __init__(self, X, Y) -> None:
+        super().__init__()
+        self.X = torch.from_numpy(X).to(device)
+        self.Y = torch.from_numpy(Y).to(device)
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, idx):
+        return self.X[idx].unsqueeze(0), self.Y[idx].unsqueeze(0)

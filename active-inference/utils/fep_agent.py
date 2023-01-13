@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from .csv_logger import CSVLogger
 from .live_plot import LivePlot
-from .functions import min_max_norm_dr2, add_gaussian_noise
+from .functions import min_max_norm_dr3, add_gaussian_noise
 
 from models.vae import VAE_CNN
 from unity.environment import UnityEnvironment
@@ -129,7 +129,7 @@ class FepAgent:
         :param inpt: (predicted) joint angles
         :return: input and output tensors (input used for backward pass)
         """
-        inpt = torch.tensor(min_max_norm_dr2(inpt, self.data_range), device=device, dtype=torch.float,
+        inpt = torch.tensor(min_max_norm_dr3(inpt, self.data_range), device=device, dtype=torch.float,
                             requires_grad=True)
         output = self.visual_decoder.visual_prediction(inpt)
         return inpt, output
