@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.barracuda": {
-      "version": "2.3.1-preview",
+      "version": "3.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -91,11 +91,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ml-agents": {
-      "version": "file:../com.unity.ml-agents",
+      "version": "file:/home/patrick/Downloads/ml-agents-release_20/com.unity.ml-agents",
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "com.unity.barracuda": "2.3.1-preview",
+        "com.unity.barracuda": "3.0.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       }

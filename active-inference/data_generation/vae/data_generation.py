@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from utils.functions import min_max_norm_dr
+from utils.functions import min_max_norm_dr2, min_max_norm_dr3
 
 
 class DataGeneration:
@@ -17,11 +17,19 @@ class DataGeneration:
     def __init__(self):
         self.shoulder_range = (-40, 40)
         self.elbow_range = (-50, 50)
-        self.data_range = np.array([self.shoulder_range, self.elbow_range])
+        self.ball_range = (-0.2, -0.05)
+        self.data_range = np.array(
+            [self.shoulder_range, self.elbow_range, self.ball_range])
         self.interval = 1
         self.img_h = 256
         self.img_w = 256
         self.n_datapoints = 8000
+
+    def get_observation(self, env):
+        joint_observation = env.get_joint_observation()
+        ball_observation = env.get_active_ball_distance()
+
+        return np.append(joint_observation, [ball_observation], axis=1)
 
     def generate_data(self, env, save_id):
         """
@@ -30,16 +38,20 @@ class DataGeneration:
         :param env: the environment object
         :param save_id: file id for saving the dataset on disk
         """
-        x = np.zeros((self.n_datapoints, 1, 2))
+        x = np.zeros((self.n_datapoints, 1, 3))
         y = np.zeros((self.n_datapoints, self.img_h, self.img_w))
 
         rotations = np.stack((np.random.uniform(*self.shoulder_range, self.n_datapoints),
                               np.random.uniform(*self.elbow_range, self.n_datapoints))).T[:, np.newaxis, :]
 
+        positions = np.stack((np.random.uniform(*self.ball_range, self.n_datapoints),
+                              np.zeros(self.n_datapoints))).T[:, np.newaxis, :]
+
         for i_rotate in range(len(rotations)):
             env.set_rotation(rotations[i_rotate])
-            x[i_rotate] = min_max_norm_dr(
-                env.get_joint_observation(), self.data_range)
+            env.set_active_ball_yAxis(positions[i_rotate])
+            x[i_rotate] = min_max_norm_dr3(
+                self.get_observation(env), self.data_range)
             y[i_rotate] = np.squeeze(env.get_visual_observation())
             if i_rotate % 500 == 0:
                 print("Generating data... " +
@@ -76,7 +88,7 @@ class DataGeneration:
                 e_rotate = ((c - (dp_per_angle/2)) /
                             (dp_per_angle/2))*self.elbow_range[1]
                 env.set_rotation(np.array([[s_rotate, e_rotate]]))
-                x[r, c] = min_max_norm_dr(
+                x[r, c] = min_max_norm_dr2(
                     env.get_joint_observation(), self.data_range)
                 y[r, c] = np.squeeze(env.get_visual_observation())
                 if r % (90//10) == 0:

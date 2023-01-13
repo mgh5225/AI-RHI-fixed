@@ -17,6 +17,7 @@ unity = UnityContainer(editor_mode)
 unity.initialise_environment()
 unity.set_mode(Mode.DataGeneration)
 unity.set_visible_arm(VisibleArm.RealArm)
+unity.set_condition(Condition.Center)
 unity.reset()
 
 # Generate and save the data

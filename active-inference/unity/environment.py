@@ -104,6 +104,11 @@ class UnityContainer:
         """:returns joint angles of the rubber arm"""
         return decision_steps.obs[self.VECTOR_OBSERVATIONS_INDEX][:, 7:9]
 
+    def get_active_ball_distance(self):
+        decision_steps, terminal_steps = self.env.get_steps(self.behavior_name)
+        """:returns distance between the active ball and real arm"""
+        return decision_steps.obs[self.VECTOR_OBSERVATIONS_INDEX][:, 9]
+
     def get_visual_observation(self):
         decision_steps, terminal_steps = self.env.get_steps(self.behavior_name)
         """:returns visual perception of the agent"""
@@ -127,6 +132,13 @@ class UnityContainer:
         """Manually set the joint angles of the rubber arm to a particular rotation"""
         action_tuple = ActionTuple()
         action_tuple.add_continuous(np.append([[2]], rotation,  axis=1))
+        self.env.set_actions(self.behavior_name, action_tuple)
+        self.env.step()
+
+    def set_active_ball_yAxis(self, yAxis):
+        """Manually set the yAxis of the active ball"""
+        action_tuple = ActionTuple()
+        action_tuple.add_continuous(np.append([[3]], yAxis,  axis=1))
         self.env.set_actions(self.behavior_name, action_tuple)
         self.env.step()
 

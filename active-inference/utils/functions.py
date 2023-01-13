@@ -16,7 +16,7 @@ def min_max_norm(data, min, max):
     return ((data - min) / (max - min)) * 2 - 1
 
 
-def min_max_norm_dr(data, data_range):
+def min_max_norm_dr2(data, data_range):
     """
     Min-max normalisation with a given data range
     :param data: data to be normalised (must be of shape (1,2))
@@ -24,6 +24,16 @@ def min_max_norm_dr(data, data_range):
     :return: normalised data (1,2)
     """
     return np.array([[min_max_norm(data[0, 0], *data_range[0]), min_max_norm(data[0, 1], *data_range[1])]])
+
+
+def min_max_norm_dr3(data, data_range):
+    """
+    Min-max normalisation with a given data range
+    :param data: data to be normalised (must be of shape (1,3))
+    :param data_range: range for normalisation
+    :return: normalised data (1,3)
+    """
+    return np.array([[min_max_norm(data[0, 0], *data_range[0]), min_max_norm(data[0, 1], *data_range[1]), min_max_norm(data[0, 2], *data_range[2])]])
 
 
 def undo_min_max_norm(data, min, max):

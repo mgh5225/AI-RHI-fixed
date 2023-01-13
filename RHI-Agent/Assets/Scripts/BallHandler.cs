@@ -51,6 +51,13 @@ public class BallHandler : MonoBehaviour
         ball_l.SetActive(parameterScript.condition == Parameters.Condition.Left);
         ball_c.SetActive(parameterScript.condition == Parameters.Condition.Center);
         ball_r.SetActive(parameterScript.condition == Parameters.Condition.Right);
+
+        if (parameterScript.mode == Parameters.Mode.dataGeneration)
+        {
+            ball_l.GetComponent<Animator>().enabled = false;
+            ball_c.GetComponent<Animator>().enabled = false;
+            ball_r.GetComponent<Animator>().enabled = false;
+        }
     }
 
     /// <summary>
@@ -78,5 +85,23 @@ public class BallHandler : MonoBehaviour
         }
     }
 
+    public GameObject getActiveBall()
+    {
+        GameObject active_ball = null;
+        if (ball_l.activeSelf == true) active_ball = ball_l;
+        if (ball_c.activeSelf == true) active_ball = ball_c;
+        if (ball_r.activeSelf == true) active_ball = ball_r;
+
+        return active_ball;
+    }
+
+    public void changeActiveBallY(float yAxis)
+    {
+        var active_ball = getActiveBall();
+        if (active_ball == null) return;
+
+        active_ball.transform.position = Vector3.Scale(active_ball.transform.position, Vector3.right + Vector3.forward) + new Vector3(0, yAxis, 0);
+
+    }
 
 }

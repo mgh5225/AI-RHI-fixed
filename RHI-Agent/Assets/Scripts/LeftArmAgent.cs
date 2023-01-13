@@ -117,6 +117,10 @@ public class LeftArmAgent : Agent
                 rubberArmController.setRelativeLeftShoulderZ(vectorAction[1]);
                 rubberArmController.setRelativeLeftElbowX(vectorAction[2]);
                 break;
+
+            case 3f:
+                ballScript.changeActiveBallY(vectorAction[1]);
+                break;
         }
     }
 
@@ -207,6 +211,14 @@ public class LeftArmAgent : Agent
 
         // Elbow extension/flexion
         sensor.AddObservation(rubberArmController.getRelativeLeftElbowX());
+
+        var active_ball = ballScript.getActiveBall();
+        float distance = 0;
+        if (active_ball != null)
+            distance = Vector3.Distance(active_ball.transform.position, leftElbowJoint.transform.position);
+
+        sensor.AddObservation(distance);
+
     }
 
 }
