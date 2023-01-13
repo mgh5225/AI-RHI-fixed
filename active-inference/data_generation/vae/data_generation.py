@@ -63,8 +63,8 @@ class DataGeneration:
         Path(self.OUTPUT_PATH+"/"+save_id+"/").mkdir(parents=True, exist_ok=True)
         np.save(self.OUTPUT_PATH+"/"+save_id+"/x"+save_id, x)
         np.save(self.OUTPUT_PATH+"/"+save_id+"/y"+save_id, y)
-        np.save(self.OUTPUT_PATH+"/"+save_id+"/data_range"+save_id,
-                np.array([self.shoulder_range, self.elbow_range]))
+        np.save(self.OUTPUT_PATH+"/"+save_id +
+                "/data_range"+save_id, self.data_range)
         print("Data saved to "+self.OUTPUT_PATH+"/" +
               save_id+"/{x,y,data_range}"+save_id+".npy")
 
