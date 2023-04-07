@@ -103,6 +103,7 @@ def full_rhi_task(condition, stimulation, with_mu, plot):
     unity.set_condition(condition)
     unity.set_stimulation(stimulation)
     unity.set_visible_arm(VisibleArm.RubberArm)
+    unity.set_mode(Mode.Inference)
     unity.reset()
 
     data_range = np.load(visual_decoder.SAVE_PATH + "/" +

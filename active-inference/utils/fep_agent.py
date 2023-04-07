@@ -25,6 +25,9 @@ class FepAgent:
     # Number of joints used
     N_JOINTS = 2
 
+    # Latent variable size
+    N_LATENT = 3
+
     # Image parameters
     IMG_WIDTH = 256
     IMG_HEIGHT = 256
@@ -51,15 +54,15 @@ class FepAgent:
         self.action_enabled = enable_action
 
         # Initialise belief vector
-        self.mu = np.zeros((1, self.N_JOINTS))
-        self.mu_dot = np.zeros((1, self.N_JOINTS))
+        self.mu = np.zeros((1, self.N_LATENT))
+        self.mu_dot = np.zeros((1, self.N_LATENT))
 
         # Initialise action vector
         self.a = np.zeros((1, self.N_JOINTS))
         self.a_dot = np.zeros((1, self.N_JOINTS))
 
         # Initialise proprioception vector
-        self.s_p = np.zeros((1, self.N_JOINTS))
+        self.s_p = np.zeros((1, self.N_LATENT))
         # Initialise visual perception matrix
         self.s_v = np.zeros((1, 1, self.IMG_HEIGHT, self.IMG_WIDTH))
 
@@ -140,7 +143,7 @@ class FepAgent:
         by back-propagating the visual prediction error through the visual decoder
         :param inpt: input tensor from the get_visual_forward function
         :param output: output tensor from the get_visual_forward function
-        :return: numpy array of shape (1, 2) containing the visual part of dF/dmu
+        :return: numpy array of shape (1, N_LATENT) containing the visual part of dF/dmu
         """
         neg_dF_dg = torch.tensor(
             (1/self.sigma_v_mu) * self.pred_error, dtype=torch.float, device=device)
@@ -160,7 +163,7 @@ class FepAgent:
         by back-propagating the visual prediction error (with respect to the attractor) through the visual decoder.
         :param inpt: input tensor from the get_visual_forward function
         :param output: output tensor from the get_visual_forward function
-        :return: numpy array of shape (1, 2) containing the attractor part of dF/dmu
+        :return: numpy array of shape (1, N_LATENT) containing the attractor part of dF/dmu
         """
         attr_error = self.attractor_im - self.g_mu
 
@@ -185,7 +188,7 @@ class FepAgent:
         Get the visual part of the partial derivative of the free energy (F) with respect to the action (a)
         by inverting the visual part of the partial derivative of the free energy (F) with respect to the belief (mu)
         :param dF_dmu_vis: partial derivative of the free energy (F) with respect to the belief (mu)
-        :return: numpy array of shape (1, 2) containing the visual part of dF/da
+        :return: numpy array of shape (1, N_LATENT) containing the visual part of dF/da
         """
         return (-1) * dF_dmu_vis
 
@@ -244,8 +247,9 @@ class FepAgent:
         self.mu = self.mu + self.dt * self.mu_dot
 
         # Compute the action:
-        self.a_dot = np.zeros((1, 2))
-        self.a_dot += -(1 / self.sigma_p) * (self.s_p - self.mu)
+        self.a_dot = np.zeros((1, self.N_JOINTS))
+        self.a_dot += (-(1 / self.sigma_p) *
+                       (self.s_p - self.mu))[0:self.N_JOINTS]
 
         # Update a:
         self.a = self.a + self.a_dot * self.dt
@@ -322,7 +326,7 @@ class FepAgent:
             if self.action_enabled:
                 self.env.act(self.a)
             else:
-                self.env.act(np.zeros((1, 2)))
+                self.env.act(np.zeros((1, self.N_JOINTS)))
 
         plt.close()
 
