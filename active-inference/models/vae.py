@@ -219,7 +219,7 @@ class VAE_CNN(nn.Module):
             loss.backward()
             optimizer.step()
 
-        return loss.item()
+        return loss.item(), predict_y
 
     @staticmethod
     def loss_function(target_y, predict_y, q, mu, logvar):
@@ -238,8 +238,10 @@ class VAE_CNN(nn.Module):
         target_var = torch.zeros(
             logvar.shape, dtype=torch.float, device=device)
         target_var[:, :] = 0.001
+        grand_truth_angles = q.squeeze()
         kld = torch.mean(-0.5 * torch.sum(1 + logvar - torch.log(target_var) -
-                                          (logvar.exp() + (q[:, 0] - mu) ** 2)/target_var, dim=1), dim=0)
+                                          (logvar.exp() + (grand_truth_angles - mu) ** 2)/target_var, dim=1), dim=0)
+
         return mse + kld
 
     def load_from_file(self, model_id):
