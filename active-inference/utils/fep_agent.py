@@ -223,6 +223,12 @@ class FepAgent:
 
         return min(max(self.prior_gamma, new_gamma), 1)
 
+    def get_observation(self):
+        joint_observation = self.env.get_joint_observation()
+        ball_observation = self.env.get_active_ball_distance()
+
+        return np.append(joint_observation, [ball_observation], axis=1)
+
     def active_inference_step(self):
         """
         Perform one active inference update step
@@ -249,7 +255,7 @@ class FepAgent:
         # Compute the action:
         self.a_dot = np.zeros((1, self.N_JOINTS))
         self.a_dot += (-(1 / self.sigma_p) *
-                       (self.s_p - self.mu))[0:self.N_JOINTS]
+                       (self.s_p - self.mu))[:, 0:self.N_JOINTS]
 
         # Update a:
         self.a = self.a + self.a_dot * self.dt
@@ -285,7 +291,7 @@ class FepAgent:
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
-                self.env.get_joint_observation(), 0, self.sp_noise_variance)
+                self.get_observation(), 0, self.sp_noise_variance)
             self.s_v[0, 0] = np.squeeze(self.env.get_visual_observation())
             self.gamma = self.get_posterior_gamma(
                 self.env.get_touch_observation())

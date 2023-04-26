@@ -111,7 +111,7 @@ class VAE_CNN(nn.Module):
         :return: output image
         """
         # Two fully connected layers of neurons:
-        x = self.relu(self.d_fc1(z))
+        x = self.relu(self.d_fc1(z.double()))
         x = self.relu(self.d_fc2(x))
 
         # Reshaping the output of the fully connected layer so that it is compatible with the conv layers
@@ -250,5 +250,6 @@ class VAE_CNN(nn.Module):
         :param model_id: save id to load from
         """
         self.load_state_dict(torch.load(os.path.join(
-            self.SAVE_PATH, model_id+"/trained_network"+model_id)))
+            self.SAVE_PATH, model_id+"/trained_network"+model_id+"final")))
         self.eval()
+        self.double()
