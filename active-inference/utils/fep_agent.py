@@ -5,11 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .csv_logger import CSVLogger
-from .live_plot import LivePlot
 from .functions import min_max_norm_dr3, add_gaussian_noise
 
 from models.vae import VAE_CNN
 from unity.environment import UnityEnvironment
+
+from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -274,7 +275,7 @@ class FepAgent:
         self.a_dot_e_tracker.append(self.a_dot[0, 1])
         """/tracking"""
 
-    def run_simulation(self, log_id: str, log_path: str, n_iterations: int, live_plot: bool = True):
+    def run_simulation(self, log_id: str, log_path: str, n_iterations: int):
         """
         Run a simulation by iteratively performing updating steps
         :param log_id: file identifier that will be used to write operation_logs to.
@@ -285,9 +286,7 @@ class FepAgent:
             csv_logger = CSVLogger(log_id, log_path)
             csv_logger.write_header(self)
 
-        # Initialise live plot
-        if live_plot:
-            plot = LivePlot(3, 2)
+        writer = SummaryWriter("runs/inference")
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
@@ -315,9 +314,14 @@ class FepAgent:
             else:
                 self.illusion = torch.cat((self.illusion, torch.tensor([0])))
 
-            if i % self.plot_interval == 0:
-                if live_plot:
-                    plot.update_live_plot(self)
+            writer.add_image("Belief", self.g_mu, i, dataformats='NCHW')
+            writer.add_image(
+                "Perception", self.s_v[0, 0], i, dataformats='HW')
+            writer.add_scalar("Beta", self.gamma, i)
+            writer.add_scalar("Mu - shoulder", self.mu[0, 0], i)
+            writer.add_scalar("a - shoulder", self.mu[0, 1], i)
+            writer.add_scalar("Mu - elbow", self.a[0, 0], i)
+            writer.add_scalar("a - elbow", self.a[0, 1], i)
             if i % 10 == 0:
                 print(
                     "Iteration", i,
