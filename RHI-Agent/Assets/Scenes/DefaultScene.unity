@@ -2097,6 +2097,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1461403084687776, guid: db33b1668a31ea24ba49cf5b03799a16, type: 3}
@@ -2168,6 +2169,7 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: db33b1668a31ea24ba49cf5b03799a16, type: 3}
 --- !u!1 &581975695
 GameObject:
@@ -5803,6 +5805,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 437292473313413897, guid: 0ff97a7a5cadbc8408bfc90cef4fa3f7, type: 3}
@@ -5890,6 +5893,7 @@ PrefabInstance:
       value: -0.327
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 0ff97a7a5cadbc8408bfc90cef4fa3f7, type: 3}
 --- !u!1 &1404333057
 GameObject:
@@ -10609,7 +10613,7 @@ MonoBehaviour:
   m_Height: 256
   m_Grayscale: 1
   m_ObservationType: 0
-  m_RuntimeCameraEnable: 0
+  m_RuntimeCameraEnable: 1
   m_ObservationStacks: 1
   m_Compression: 0
 --- !u!1 &1421626944
@@ -16467,6 +16471,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 2
     m_TransformParent: {fileID: 1060386812}
     m_Modifications:
     - target: {fileID: 1142132592601588805, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
@@ -16573,8 +16578,16 @@ PrefabInstance:
       value: 2.4885528
       objectReference: {fileID: 0}
     - target: {fileID: 2274404080660613457, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
+      propertyPath: m_textAlignment
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 2274404080660613457, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
       propertyPath: m_enableAutoSizing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2274404080660613457, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 2274404080660613457, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
       propertyPath: m_textInfo.lineCount
@@ -16624,7 +16637,9 @@ PrefabInstance:
       propertyPath: objectTwo
       value: 
       objectReference: {fileID: 118205148}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7401034389571803714, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
+    m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 1122976aef4e56d49904d3f5f7fecdc2, type: 3}
 --- !u!114 &666574345640370969 stripped
 MonoBehaviour:
