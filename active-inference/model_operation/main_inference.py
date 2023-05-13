@@ -65,7 +65,7 @@ def reaching_tasks(model, position_import_model_id=None):
             unity.close()
 
 
-def rhi_task(condition, stimulation):
+def rhi_task(condition: Condition, stimulation: Stimulation):
     n_iterations = 1500
     unity = UnityContainer(editor_mode)
     unity.initialise_environment()
@@ -79,13 +79,15 @@ def rhi_task(condition, stimulation):
 
     data_range = np.load(visual_decoder.SAVE_PATH + "/" +
                          model_id + "/data_range" + model_id + ".npy")
-    central = FepAgent(unity, visual_decoder, data_range, enable_action=False)
+    agent = FepAgent(unity, visual_decoder, data_range, enable_action=False)
 
-    central.run_simulation(log_id, log_path, n_iterations)
+    mode_name = f"{condition.name.lower()}_{stimulation.name.lower()}"
+
+    agent.run_simulation(log_id, log_path, n_iterations, mode_name)
     unity.close()
 
 
-def full_rhi_task(condition, stimulation, with_mu, plot):
+def full_rhi_task(condition: Condition, stimulation: Stimulation, with_mu: bool, plot: bool):
     n_iterations = 1500
 
     mlp_configs = configs.mlp_configs
@@ -110,7 +112,10 @@ def full_rhi_task(condition, stimulation, with_mu, plot):
                          model_id + "/data_range" + model_id + ".npy")
 
     agent = FepAgent(unity, visual_decoder, data_range, enable_action=False)
-    agent.run_simulation(log_id, log_path, n_iterations)
+
+    mode_name = f"{condition.name.lower()}_{stimulation.name.lower()}"
+
+    agent.run_simulation(log_id, log_path, n_iterations, mode_name)
 
     if plot:
         mlp.plot_y(n_iterations, agent)
@@ -122,8 +127,17 @@ def full_rhi_task(condition, stimulation, with_mu, plot):
 
 
 # Example RHI task
-# rhi_task(Condition.Left, Stimulation.Asynchronous)
-full_rhi_task(Condition.Left, Stimulation.Synchronous, True, True)
-full_rhi_task(Condition.Center, Stimulation.Synchronous, True, True)
-full_rhi_task(Condition.Right, Stimulation.Synchronous, True, True)
-# full_rhi_task(Condition.Left, Stimulation.Asynchronous, False,False)
+rhi_task(Condition.Left, Stimulation.Synchronous)
+rhi_task(Condition.Left, Stimulation.Asynchronous)
+
+rhi_task(Condition.Center, Stimulation.Synchronous)
+rhi_task(Condition.Center, Stimulation.Asynchronous)
+
+rhi_task(Condition.Right, Stimulation.Synchronous)
+rhi_task(Condition.Right, Stimulation.Asynchronous)
+
+rhi_task(Condition.RandReachClose, Stimulation.Synchronous)
+rhi_task(Condition.RandReachClose, Stimulation.Asynchronous)
+
+rhi_task(Condition.RandReachFar, Stimulation.Synchronous)
+rhi_task(Condition.RandReachFar, Stimulation.Asynchronous)

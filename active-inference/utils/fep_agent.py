@@ -275,7 +275,7 @@ class FepAgent:
         self.a_dot_e_tracker.append(self.a_dot[0, 1])
         """/tracking"""
 
-    def run_simulation(self, log_id: str, log_path: str, n_iterations: int):
+    def run_simulation(self, log_id: str, log_path: str, n_iterations: int, mode_name: str):
         """
         Run a simulation by iteratively performing updating steps
         :param log_id: file identifier that will be used to write operation_logs to.
@@ -286,8 +286,8 @@ class FepAgent:
             csv_logger = CSVLogger(log_id, log_path)
             csv_logger.write_header(self)
 
-        b_writer = SummaryWriter("runs/inference/belief")
-        p_writer = SummaryWriter("runs/inference/perception")
+        b_writer = SummaryWriter(f"runs/inference/belief/{mode_name}")
+        p_writer = SummaryWriter(f"runs/inference/perception/{mode_name}")
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
