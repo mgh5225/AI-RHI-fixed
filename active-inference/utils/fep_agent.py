@@ -286,7 +286,8 @@ class FepAgent:
             csv_logger = CSVLogger(log_id, log_path)
             csv_logger.write_header(self)
 
-        writer = SummaryWriter("runs/inference")
+        b_writer = SummaryWriter("runs/inference/belief")
+        p_writer = SummaryWriter("runs/inference/perception")
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
@@ -314,14 +315,24 @@ class FepAgent:
             else:
                 self.illusion = torch.cat((self.illusion, torch.tensor([0])))
 
-            writer.add_image("Belief", self.g_mu, i, dataformats='NCHW')
-            writer.add_image(
-                "Perception", self.s_v[0, 0], i, dataformats='HW')
-            writer.add_scalar("Beta", self.gamma, i)
-            writer.add_scalar("Mu - shoulder", self.mu[0, 0], i)
-            writer.add_scalar("a - shoulder", self.mu[0, 1], i)
-            writer.add_scalar("Mu - elbow", self.a[0, 0], i)
-            writer.add_scalar("a - elbow", self.a[0, 1], i)
+            # Image
+            b_writer.add_image("Eye", self.g_mu, i, dataformats='NCHW')
+            p_writer.add_image(
+                "Eye", self.s_v[0, 0], i, dataformats='HW')
+
+            b_writer.add_scalar("Mu - shoulder", self.mu[0, 0], i)
+            b_writer.add_scalar("Mu - elbow", self.mu[0, 1], i)
+            b_writer.add_scalar("Mu - height", self.mu[0, 2], i)
+
+            p_writer.add_scalar("Mu - shoulder", self.s_p[0, 0], i)
+            p_writer.add_scalar("Mu - elbow", self.s_p[0, 1], i)
+            p_writer.add_scalar("Mu - height", self.s_p[0, 2], i)
+
+            b_writer.add_scalar("a - shoulder", self.a[0, 0], i)
+            b_writer.add_scalar("a - elbow", self.a[0, 1], i)
+
+            b_writer.add_scalar("Gamma", self.gamma, i)
+
             if i % 10 == 0:
                 print(
                     "Iteration", i,
