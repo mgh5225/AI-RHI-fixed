@@ -12,7 +12,7 @@ from unity.environment import UnityContainer
 
 editor_mode = 0
 model_id = "vae"
-mode_prefix = ''
+mode_prefix = 'init_mu_'
 log_id = "test"
 log_path = os.path.join(os.path.dirname(__file__), "operation_logs/")
 
@@ -31,7 +31,13 @@ def rhi_task(condition: Condition, stimulation: Stimulation):
 
     data_range = np.load(visual_decoder.SAVE_PATH + "/" +
                          model_id + "/data_range" + model_id + ".npy")
-    agent = FepAgent(unity, visual_decoder, data_range, enable_action=False)
+    agent = FepAgent(
+        unity,
+        visual_decoder,
+        data_range,
+        enable_action=False,
+        init_mu=True
+    )
 
     mode_name = f"{mode_prefix}{condition.name.lower()}_{stimulation.name.lower()}"
 
@@ -87,9 +93,3 @@ rhi_task(Condition.Center, Stimulation.Asynchronous)
 
 rhi_task(Condition.Right, Stimulation.Synchronous)
 rhi_task(Condition.Right, Stimulation.Asynchronous)
-
-rhi_task(Condition.RandReachClose, Stimulation.Synchronous)
-rhi_task(Condition.RandReachClose, Stimulation.Asynchronous)
-
-rhi_task(Condition.RandReachFar, Stimulation.Synchronous)
-rhi_task(Condition.RandReachFar, Stimulation.Asynchronous)

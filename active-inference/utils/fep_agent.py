@@ -35,13 +35,16 @@ class FepAgent:
 
     # Minimum number of visuo-tactile stimulation to get illusion
 
-    def __init__(self,
-                 environment: UnityEnvironment,
-                 visual_decoder: VAE_CNN,
-                 data_range,
-                 enable_action: bool,
-                 attractor_image=None,
-                 min_iter_for_illusion=100):
+    def __init__(
+        self,
+        environment: UnityEnvironment,
+        visual_decoder: VAE_CNN,
+        data_range,
+        enable_action: bool,
+        attractor_image=None,
+        min_iter_for_illusion=100,
+        init_mu=False
+    ):
         """
         Initialise the agent
         :param environment: environment the agent resides in
@@ -53,6 +56,7 @@ class FepAgent:
         self.visual_decoder = visual_decoder
         self.data_range = data_range
         self.action_enabled = enable_action
+        self.init_mu = init_mu
 
         # Initialise belief vector
         self.mu = np.zeros((1, self.N_LATENT))
@@ -289,6 +293,10 @@ class FepAgent:
         b_writer = SummaryWriter(f"runs/inference/belief/{mode_name}")
         p_writer = SummaryWriter(f"runs/inference/perception/{mode_name}")
 
+        if self.init_mu:
+            o_mu = self.get_mu_observation()
+            self.mu = o_mu[np.newaxis, ...]
+
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(
                 self.get_observation(), 0, self.sp_noise_variance)
@@ -355,7 +363,7 @@ class FepAgent:
         visual_observation = torch.from_numpy(
             self.env.get_visual_observation()).to(device)
 
-        visual_observation = visual_observation.permute((2, 0, 1))
+        visual_observation = visual_observation.permute((2, 0, 1)).double()
 
         output = self.visual_decoder.mu_prediction(
             visual_observation.unsqueeze(0))
