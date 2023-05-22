@@ -54,6 +54,13 @@ public class Parameters : MonoBehaviour
         Python_configured
     }
 
+    [System.Serializable]
+    public struct BallRange
+    {
+        public float b_min;
+        public float b_max;
+    }
+
     [Tooltip("Experimental condition")]
     public Condition conditionSetMe;
 
@@ -73,6 +80,8 @@ public class Parameters : MonoBehaviour
     public Stimulation stimulation;
 
     public Mode mode;
+
+    public BallRange ballRange;
 
     private GameObject[] cameraObjects;
 
@@ -100,6 +109,8 @@ public class Parameters : MonoBehaviour
         setCondition();
         setVisibleArm();
         setStimulation();
+        setMode();
+        setBallRange();
     }
 
     /// <summary>
@@ -184,6 +195,12 @@ public class Parameters : MonoBehaviour
         {
             mode = modeSetMe;
         }
+    }
+
+    private void setBallRange()
+    {
+        ballRange.b_min = Academy.Instance.EnvironmentParameters.GetWithDefault("ball_range_min", 0f);
+        ballRange.b_max = Academy.Instance.EnvironmentParameters.GetWithDefault("ball_range_max", 0.1f);
     }
 }
 

@@ -13,10 +13,13 @@ public class BallHandler : MonoBehaviour
     [Tooltip("Parameters object")]
     public GameObject parameterObject;
 
+    public Transform ballPosition;
+
     private Parameters parameterScript;
     private GameObject ball_l;
     private GameObject ball_c;
     private GameObject ball_r;
+    private GameObject ball_d;
     private float lastTouch;
     private object lastTouchLock = new object();
 
@@ -47,17 +50,78 @@ public class BallHandler : MonoBehaviour
         ball_l = this.transform.Find("ball_l").gameObject;
         ball_c = this.transform.Find("ball_c").gameObject;
         ball_r = this.transform.Find("ball_r").gameObject;
-
-        ball_l.SetActive(parameterScript.condition == Parameters.Condition.Left);
-        ball_c.SetActive(parameterScript.condition == Parameters.Condition.Center);
-        ball_r.SetActive(parameterScript.condition == Parameters.Condition.Right);
+        ball_d = this.transform.Find("ball_d").gameObject;
 
         if (parameterScript.mode == Parameters.Mode.dataGeneration)
         {
+            ball_l.SetActive(parameterScript.condition == Parameters.Condition.Left);
+            ball_c.SetActive(parameterScript.condition == Parameters.Condition.Center);
+            ball_r.SetActive(parameterScript.condition == Parameters.Condition.Right);
+
             ball_l.GetComponent<Animator>().enabled = false;
             ball_c.GetComponent<Animator>().enabled = false;
             ball_r.GetComponent<Animator>().enabled = false;
         }
+        else
+        {
+            ball_d.SetActive(true);
+            SetRange(
+                ball_d,
+                ballPosition.position,
+                parameterScript.ballRange.b_min,
+                parameterScript.ballRange.b_max
+            );
+        }
+    }
+
+    public void SetRange(GameObject obj, Vector3 pos, float min, float max)
+    {
+        var _animation = obj.GetComponent<Animation>();
+
+        if (!_animation) _animation = obj.AddComponent<Animation>();
+
+        var clip = new AnimationClip();
+
+        clip.name = "Dynamic Ball";
+        clip.legacy = true;
+
+        var k_x = new Keyframe[1];
+        var k_y = new Keyframe[3];
+        var k_z = new Keyframe[1];
+
+        k_x[0] = new Keyframe(0f, pos.x - transform.position.x);
+
+        k_y[0] = new Keyframe(0f, max + pos.y - transform.position.y + 0.025f);
+        k_y[1] = new Keyframe(1f, min + pos.y - transform.position.y + 0.025f);
+        k_y[1].weightedMode = WeightedMode.Both;
+        k_y[1].inTangent = -1f;
+        k_y[1].outTangent = 1f;
+        k_y[1].inWeight = max - min;
+        k_y[1].outWeight = max - min;
+        k_y[2] = new Keyframe(2f, max + pos.y - transform.position.y + 0.025f);
+
+        k_z[0] = new Keyframe(0f, pos.z - transform.position.z);
+
+        var x_curve = new AnimationCurve(k_x);
+        var y_curve = new AnimationCurve(k_y);
+        var z_curve = new AnimationCurve(k_z);
+
+        clip.SetCurve("", typeof(Transform), "localPosition.x", x_curve);
+        clip.SetCurve("", typeof(Transform), "localPosition.y", y_curve);
+        clip.SetCurve("", typeof(Transform), "localPosition.z", z_curve);
+
+        var evt = new AnimationEvent();
+
+        evt.functionName = "TouchCallBack";
+        evt.time = 1f;
+
+        clip.AddEvent(evt);
+
+        _animation.clip = clip;
+        _animation.AddClip(clip, clip.name);
+        _animation.playAutomatically = true;
+        _animation.wrapMode = WrapMode.Loop;
+        _animation.Play();
     }
 
     /// <summary>
@@ -91,6 +155,7 @@ public class BallHandler : MonoBehaviour
         if (ball_l.activeSelf == true) active_ball = ball_l;
         if (ball_c.activeSelf == true) active_ball = ball_c;
         if (ball_r.activeSelf == true) active_ball = ball_r;
+        if (ball_d.activeSelf == true) active_ball = ball_d;
 
         return active_ball;
     }
