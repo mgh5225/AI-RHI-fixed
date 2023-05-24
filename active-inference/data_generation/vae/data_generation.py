@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from utils.functions import min_max_norm_dr2, min_max_norm_dr3
+from utils.functions import min_max_norm_dr
 
 
 class DataGeneration:
@@ -50,7 +50,7 @@ class DataGeneration:
         for i_rotate in range(len(rotations)):
             env.set_rotation(rotations[i_rotate])
             env.set_active_ball_yAxis(positions[i_rotate])
-            x[i_rotate] = min_max_norm_dr3(
+            x[i_rotate] = min_max_norm_dr(
                 self.get_observation(env), self.data_range)
             y[i_rotate] = np.squeeze(env.get_visual_observation())
             if i_rotate % 500 == 0:
@@ -88,8 +88,8 @@ class DataGeneration:
                 e_rotate = ((c - (dp_per_angle/2)) /
                             (dp_per_angle/2))*self.elbow_range[1]
                 env.set_rotation(np.array([[s_rotate, e_rotate]]))
-                x[r, c] = min_max_norm_dr2(
-                    env.get_joint_observation(), self.data_range)
+                x[r, c] = min_max_norm_dr(
+                    env.get_joint_observation(), self.data_range[:2])
                 y[r, c] = np.squeeze(env.get_visual_observation())
                 if r % (90//10) == 0:
                     print("Generating data... " +

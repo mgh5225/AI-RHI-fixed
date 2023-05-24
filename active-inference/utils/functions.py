@@ -7,54 +7,64 @@ from torch.autograd.gradcheck import zero_gradients
 
 def min_max_norm(data, min, max):
     """
-    Min-max normalisation
-    :param data: data to be normalised
-    :param min: min value (value that corresponds to -1 after normalisation)
-    :param max: max value (value that corresponds to 1 after normalisation)
-    :return: normalised data
+    Min-max normalization
+    :param data: data to be normalized
+    :param min: min value (value that corresponds to -1 after normalization)
+    :param max: max value (value that corresponds to 1 after normalization)
+    :return: normalized data
     """
     return ((data - min) / (max - min)) * 2 - 1
 
 
-def min_max_norm_dr2(data, data_range):
+def min_max_norm_dr(data, data_range):
     """
-    Min-max normalisation with a given data range
-    :param data: data to be normalised (must be of shape (1,2))
-    :param data_range: range for normalisation
-    :return: normalised data (1,2)
+    Min-max normalization with a given data range
+    :param data: data to be normalized
+    :param data_range: range for normalization
+    :return: normalized data
     """
-    return np.array([[min_max_norm(data[0, 0], *data_range[0]), min_max_norm(data[0, 1], *data_range[1])]])
+    min_l = []
+    max_l = []
 
+    for min, max in data_range:
+        min_l.append(min)
+        max_l.append(max)
 
-def min_max_norm_dr3(data, data_range):
-    """
-    Min-max normalisation with a given data range
-    :param data: data to be normalised (must be of shape (1,3))
-    :param data_range: range for normalisation
-    :return: normalised data (1,3)
-    """
-    return np.array([[min_max_norm(data[0, 0], *data_range[0]), min_max_norm(data[0, 1], *data_range[1]), min_max_norm(data[0, 2], *data_range[2])]])
+    min = np.array(min_l)
+    max = np.array(max_l)
+
+    return min_max_norm(data, min, max)
 
 
 def undo_min_max_norm(data, min, max):
     """
-    Transform data normalised between -1 and 1 to the provided range
-    :param data: data to be de-normalised
+    Transform data normalized between -1 and 1 to the provided range
+    :param data: data to be de-normalized
     :param min: min value (values corresponding to -1 will get this value)
     :param max: max value (values corresponding to 1 will get this value)
-    :return: de-normalised data
+    :return: de-normalized data
     """
     return (((data + 1) / 2) * (max - min)) + min
 
 
 def undo_min_max_norm_dr(data, data_range):
     """
-    Transform data normalised between -1 and 1 to the provided range
-    :param data: data to be de-normalised (must be of shape (1,2))
-    :param data_range: range for de-normalisation
-    :return: de-normalised data (shape (1,2))
+    Transform data normalized between -1 and 1 to the provided range
+    :param data: data to be de-normalized
+    :param data_range: range for de-normalization
+    :return: de-normalized data
     """
-    return np.array([[undo_min_max_norm(data[0, 0], *data_range[0]), undo_min_max_norm(data[0, 1], *data_range[1])]])
+    min_l = []
+    max_l = []
+
+    for min, max in data_range:
+        min_l.append(min)
+        max_l.append(max)
+
+    min = np.array(min_l)
+    max = np.array(max_l)
+
+    return undo_min_max_norm(data, min, max)
 
 
 def add_gaussian_noise(array, mean, variance):

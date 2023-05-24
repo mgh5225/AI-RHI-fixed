@@ -5,10 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .csv_logger import CSVLogger
-from .functions import min_max_norm_dr3, add_gaussian_noise
+from .functions import min_max_norm_dr, add_gaussian_noise
 
 from models.vae import VAE_CNN
-from unity.environment import UnityEnvironment
+from unity.environment import UnityContainer
+from unity.enums import *
 
 from torch.utils.tensorboard import SummaryWriter
 
@@ -37,7 +38,7 @@ class FepAgent:
 
     def __init__(
         self,
-        environment: UnityEnvironment,
+        environment: UnityContainer,
         visual_decoder: VAE_CNN,
         data_range,
         enable_action: bool,
@@ -137,7 +138,7 @@ class FepAgent:
         :param inpt: (predicted) joint angles
         :return: input and output tensors (input used for backward pass)
         """
-        inpt = torch.tensor(min_max_norm_dr3(inpt, self.data_range), device=device, dtype=torch.float,
+        inpt = torch.tensor(min_max_norm_dr(inpt, self.data_range), device=device, dtype=torch.float,
                             requires_grad=True)
         output = self.visual_decoder.visual_prediction(inpt)
         return inpt, output
@@ -279,7 +280,7 @@ class FepAgent:
         self.a_dot_e_tracker.append(self.a_dot[0, 1])
         """/tracking"""
 
-    def run_simulation(self, log_id: str, log_path: str, n_iterations: int, mode_name: str):
+    def run_simulation(self, log_id: str, log_path: str, n_iterations: int, dir_name: str, mode_name: str):
         """
         Run a simulation by iteratively performing updating steps
         :param log_id: file identifier that will be used to write operation_logs to.
@@ -290,12 +291,20 @@ class FepAgent:
             csv_logger = CSVLogger(log_id, log_path)
             csv_logger.write_header(self)
 
-        b_writer = SummaryWriter(f"runs/inference/belief/{mode_name}")
-        p_writer = SummaryWriter(f"runs/inference/perception/{mode_name}")
+        b_writer = SummaryWriter(f"runs/{dir_name}/belief/{mode_name}")
+        p_writer = SummaryWriter(f"runs/{dir_name}/perception/{mode_name}")
 
         if self.init_mu:
+            env_condition = self.env.env_condition
+
+            self.env.set_condition(Condition.Center)
+            self.env.reset()
+
             o_mu = self.get_mu_observation()
             self.mu = o_mu[np.newaxis, ...]
+
+            self.env.set_condition(env_condition)
+            self.env.reset()
 
         for i in range(n_iterations):
             self.s_p = add_gaussian_noise(

@@ -35,3 +35,15 @@ class Mode(enum.Enum):
     """
     DataGeneration = 0.0
     Inference = 1.0
+
+
+class BallRange:
+    """
+    Struct used to configure the range of the ball
+    """
+    b_min = 0
+    b_max = 0.1
+
+    def __init__(self, b_min, b_max) -> None:
+        self.b_min = b_min
+        self.b_max = b_max

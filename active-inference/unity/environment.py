@@ -36,6 +36,12 @@ class UnityContainer:
         self.behavior_name = None
         self.spec = None
 
+        self.env_condition = None
+        self.env_visible_arm = None
+        self.env_stimulation = None
+        self.env_mode = None
+        self.env_ball_range = None
+
     def initialise_environment(self):
         """Initialise and reset unity environment"""
         engine_configuration_channel = EngineConfigurationChannel()
@@ -56,23 +62,35 @@ class UnityContainer:
 
     def set_condition(self, condition: Condition):
         """Sets the experimental condition setting"""
+        self.env_condition = condition
         self.env_params_channel.set_float_parameter(
             "condition", condition.value)
 
     def set_visible_arm(self, visible_arm: VisibleArm):
         """Sets the visible arm setting"""
+        self.env_visible_arm = visible_arm
         self.env_params_channel.set_float_parameter(
             "visiblearm", visible_arm.value)
 
     def set_stimulation(self, stimulation: Stimulation):
         """Sets the stimulation setting"""
+        self.env_stimulation = stimulation
         self.env_params_channel.set_float_parameter(
             "stimulation", stimulation.value)
 
     def set_mode(self, mode: Mode):
         """Sets the mode setting"""
+        self.env_mode = mode
         self.env_params_channel.set_float_parameter(
             "mode", mode.value)
+
+    def set_ball_range(self, ball_range: BallRange):
+        """Sets the ball range setting"""
+        self.env_ball_range = ball_range
+        self.env_params_channel.set_float_parameter(
+            "ball_range_min", ball_range.b_min)
+        self.env_params_channel.set_float_parameter(
+            "ball_range_max", ball_range.b_max)
 
     def get_joint_observation(self):
         decision_steps, terminal_steps = self.env.get_steps(self.behavior_name)

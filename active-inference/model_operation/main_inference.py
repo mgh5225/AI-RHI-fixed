@@ -12,7 +12,8 @@ from unity.environment import UnityContainer
 
 editor_mode = 0
 model_id = "vae"
-mode_prefix = 'init_mu_'
+mode_prefix = 'init_mu_centered_'
+dir_name = 'inference'
 log_id = "test"
 log_path = os.path.join(os.path.dirname(__file__), "operation_logs/")
 
@@ -29,19 +30,36 @@ def rhi_task(condition: Condition, stimulation: Stimulation):
     unity.set_visible_arm(VisibleArm.RubberArm)
     unity.reset()
 
-    data_range = np.load(visual_decoder.SAVE_PATH + "/" +
-                         model_id + "/data_range" + model_id + ".npy")
-    agent = FepAgent(
-        unity,
-        visual_decoder,
-        data_range,
-        enable_action=False,
-        init_mu=True
-    )
-
     mode_name = f"{mode_prefix}{condition.name.lower()}_{stimulation.name.lower()}"
 
-    agent.run_simulation(log_id, log_path, n_iterations, mode_name)
+    ball_ranges = [
+        BallRange(0.1, 0.2),
+        BallRange(0.2, 0.3),
+        BallRange(0.1, 0.4),
+        BallRange(0, 0.4)
+    ]
+
+    data_range = np.load(visual_decoder.SAVE_PATH + "/" +
+                         model_id + "/data_range" + model_id + ".npy")
+
+    for ball_range in ball_ranges:
+        unity.set_ball_range(ball_range)
+        unity.reset()
+
+        data_range[2] = (ball_range.b_min, ball_range.b_max)
+
+        agent = FepAgent(
+            unity,
+            visual_decoder,
+            data_range,
+            enable_action=False,
+            init_mu=True
+        )
+
+        dir_name_new = dir_name + f"_{ball_range.b_min}_{ball_range.b_max}"
+        agent.run_simulation(
+            log_id, log_path, n_iterations, dir_name_new, mode_name)
+
     unity.close()
 
 
@@ -73,7 +91,7 @@ def full_rhi_task(condition: Condition, stimulation: Stimulation, with_mu: bool,
 
     mode_name = f"{mode_prefix}{condition.name.lower()}_{stimulation.name.lower()}"
 
-    agent.run_simulation(log_id, log_path, n_iterations, mode_name)
+    agent.run_simulation(log_id, log_path, n_iterations, dir_name, mode_name)
 
     if plot:
         mlp.plot_y(n_iterations, agent)
