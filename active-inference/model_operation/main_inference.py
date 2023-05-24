@@ -32,29 +32,27 @@ def rhi_task(condition: Condition, stimulation: Stimulation):
 
     mode_name = f"{mode_prefix}{condition.name.lower()}_{stimulation.name.lower()}"
 
+    # The proper range for ball is (0, 0.15)
     ball_ranges = [
-        BallRange(0.1, 0.2),
-        BallRange(0.2, 0.3),
-        BallRange(0.1, 0.4),
-        BallRange(0, 0.4)
+        BallRange(0, 0.05),
+        BallRange(0, 0.15),
+        BallRange(0.1, 0.15),
     ]
 
     data_range = np.load(visual_decoder.SAVE_PATH + "/" +
                          model_id + "/data_range" + model_id + ".npy")
 
+    agent = FepAgent(
+        unity,
+        visual_decoder,
+        data_range,
+        enable_action=False,
+        init_mu=True
+    )
+
     for ball_range in ball_ranges:
         unity.set_ball_range(ball_range)
         unity.reset()
-
-        data_range[2] = (ball_range.b_min, ball_range.b_max)
-
-        agent = FepAgent(
-            unity,
-            visual_decoder,
-            data_range,
-            enable_action=False,
-            init_mu=True
-        )
 
         dir_name_new = dir_name + f"_{ball_range.b_min}_{ball_range.b_max}"
         agent.run_simulation(
