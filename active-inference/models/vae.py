@@ -30,11 +30,11 @@ class VAE_CNN(nn.Module):
         self.e_fc3 = nn.Linear(1024, 512)
 
         # Variational latent variable layers
-        self.fc_mu_hand = nn.Linear(512, 2)
-        self.fc_logvar_hand = nn.Linear(512, 2)
+        self.fc_mu1 = nn.Linear(512, 2)
+        self.fc_logvar1 = nn.Linear(512, 2)
 
-        self.fc_mu_ball = nn.Linear(512, 2)
-        self.fc_logvar_ball = nn.Linear(512, 2)
+        self.fc_mu2 = nn.Linear(512, 2)
+        self.fc_logvar2 = nn.Linear(512, 2)
 
         # Decoder
         self.d_fc1 = nn.Linear(4, 1024)
@@ -79,14 +79,14 @@ class VAE_CNN(nn.Module):
         x = self.relu(self.e_fc2(x))
         x = self.relu(self.e_fc3(x))
 
-        mu_hand = self.fc_mu_hand(x)
-        logvar_hand = self.fc_mu_hand(x)
+        mu1 = self.fc_mu1(x)
+        logvar1 = self.fc_mu1(x)
 
-        mu_ball = self.fc_mu_ball(x)
-        logvar_ball = self.fc_mu_ball(x)
+        mu2 = self.fc_mu2(x)
+        logvar2 = self.fc_mu2(x)
 
-        mu = torch.cat(mu_hand, mu_ball)
-        logvar = torch.cat(logvar_hand, logvar_ball)
+        mu = torch.cat(mu1, mu2)
+        logvar = torch.cat(logvar1, logvar2)
 
         # Return latent parameters
         return mu, logvar
@@ -102,13 +102,13 @@ class VAE_CNN(nn.Module):
         eps = torch.randn_like(logvar)
         return eps * torch.exp(0.5 * logvar) + mu
 
-    def visual_prediction(self, mu):
+    def visual_prediction(self, z):
         """
         Get visual prediction for a set of joint angles
-        :param mu: joint angle belief to generate prediction for
+        :param z: latent variable
         :return: visual prediction
         """
-        return self.decode(mu)
+        return self.decode(z)
 
     def get_z(self, x):
         mu, logvar = self.encode(x)
