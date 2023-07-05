@@ -374,7 +374,7 @@ class FepAgent:
 
         visual_observation = visual_observation.permute((2, 0, 1)).double()
 
-        output = self.visual_decoder.mu_prediction(
+        output = self.visual_decoder.get_z(
             visual_observation.unsqueeze(0))
 
         o_mu = (output[0]).data.cpu().numpy()

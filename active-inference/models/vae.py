@@ -11,7 +11,6 @@ from torch.utils.tensorboard import SummaryWriter
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-# Adjusted from https://github.com/bhpfelix/Variational-Autoencoder-PyTorch/blob/master/src/vanila_vae.py
 class VAE_CNN(nn.Module):
     SAVE_PATH = os.path.join(os.path.dirname(__file__), "trained_vae_cnn")
 
@@ -31,11 +30,14 @@ class VAE_CNN(nn.Module):
         self.e_fc3 = nn.Linear(1024, 512)
 
         # Variational latent variable layers
-        self.fc_mu = nn.Linear(512, 3)
-        self.fc_logvar = nn.Linear(512, 3)
+        self.fc_mu_hand = nn.Linear(512, 2)
+        self.fc_logvar_hand = nn.Linear(512, 2)
+
+        self.fc_mu_ball = nn.Linear(512, 2)
+        self.fc_logvar_ball = nn.Linear(512, 2)
 
         # Decoder
-        self.d_fc1 = nn.Linear(3, 1024)
+        self.d_fc1 = nn.Linear(4, 1024)
         self.d_fc2 = nn.Linear(1024, 8 * 8 * 128)
 
         self.d_upconv1 = nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1)
@@ -77,11 +79,20 @@ class VAE_CNN(nn.Module):
         x = self.relu(self.e_fc2(x))
         x = self.relu(self.e_fc3(x))
 
+        mu_hand = self.fc_mu_hand(x)
+        logvar_hand = self.fc_mu_hand(x)
+
+        mu_ball = self.fc_mu_ball(x)
+        logvar_ball = self.fc_mu_ball(x)
+
+        mu = torch.cat(mu_hand, mu_ball)
+        logvar = torch.cat(logvar_hand, logvar_ball)
+
         # Return latent parameters
-        return self.fc_mu(x), self.fc_logvar(x)
+        return mu, logvar
 
     @staticmethod
-    def reparameterize(mu, logvar):
+    def sample_z(mu, logvar):
         """
         Randomly sample z based on mu and logvar vectors
         :param mu: mu vector
@@ -99,9 +110,9 @@ class VAE_CNN(nn.Module):
         """
         return self.decode(mu)
 
-    def mu_prediction(self, x):
+    def get_z(self, x):
         mu, logvar = self.encode(x)
-        z = self.reparameterize(mu, logvar)
+        z = self.sample_z(mu, logvar)
         return z
 
     def decode(self, z):
@@ -140,7 +151,7 @@ class VAE_CNN(nn.Module):
         :return: network output, mu and logvar vectors
         """
         mu, logvar = self.encode(x)
-        z = self.reparameterize(mu, logvar)
+        z = self.sample_z(mu, logvar)
         output = self.decode(z)
         return output, mu, logvar
 

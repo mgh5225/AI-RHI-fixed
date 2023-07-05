@@ -2,7 +2,6 @@ import numpy as np
 import os
 
 from utils import configs
-from utils.csv_logger import CSVLogger
 from utils.fep_agent import FepAgent
 from models.main import MLP
 from models.vae import VAE_CNN
