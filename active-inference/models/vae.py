@@ -30,14 +30,11 @@ class VAE_CNN(nn.Module):
         self.e_fc3 = nn.Linear(1024, 512)
 
         # Variational latent variable layers
-        self.fc_mu1 = nn.Linear(512, 2)
-        self.fc_logvar1 = nn.Linear(512, 2)
-
-        self.fc_mu2 = nn.Linear(512, 2)
-        self.fc_logvar2 = nn.Linear(512, 2)
+        self.fc_mu = nn.Linear(512, 3)
+        self.fc_logvar = nn.Linear(512, 3)
 
         # Decoder
-        self.d_fc1 = nn.Linear(4, 1024)
+        self.d_fc1 = nn.Linear(3, 1024)
         self.d_fc2 = nn.Linear(1024, 8 * 8 * 128)
 
         self.d_upconv1 = nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1)
@@ -79,14 +76,8 @@ class VAE_CNN(nn.Module):
         x = self.relu(self.e_fc2(x))
         x = self.relu(self.e_fc3(x))
 
-        mu1 = self.fc_mu1(x)
-        logvar1 = self.fc_mu1(x)
-
-        mu2 = self.fc_mu2(x)
-        logvar2 = self.fc_mu2(x)
-
-        mu = torch.cat(mu1, mu2)
-        logvar = torch.cat(logvar1, logvar2)
+        mu = self.fc_mu(x)
+        logvar = self.fc_logvar(x)
 
         # Return latent parameters
         return mu, logvar
