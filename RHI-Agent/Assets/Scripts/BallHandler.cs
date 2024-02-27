@@ -52,7 +52,7 @@ public class BallHandler : MonoBehaviour
         ball_r = this.transform.Find("ball_r").gameObject;
         ball_d = this.transform.Find("ball_d").gameObject;
 
-        if (parameterScript.mode == Parameters.Mode.dataGeneration)
+        if (parameterScript.mode == Parameters.Mode.dataGenerationWithBall)
         {
             ball_l.SetActive(parameterScript.condition == Parameters.Condition.Left);
             ball_c.SetActive(parameterScript.condition == Parameters.Condition.Center);

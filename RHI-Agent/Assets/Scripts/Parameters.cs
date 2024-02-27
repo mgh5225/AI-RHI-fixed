@@ -49,8 +49,9 @@ public class Parameters : MonoBehaviour
     /// </summary>
     public enum Mode
     {
-        dataGeneration,
         inference,
+        dataGeneration,
+        dataGenerationWithBall,
         Python_configured
     }
 
@@ -189,7 +190,7 @@ public class Parameters : MonoBehaviour
         if (modeSetMe == Mode.Python_configured)
         {
             // mode = (Mode)(int)Academy.Instance.FloatProperties.GetPropertyWithDefault("mode", 1f);
-            mode = (Mode)(int)Academy.Instance.EnvironmentParameters.GetWithDefault("mode", 1f);
+            mode = (Mode)(int)Academy.Instance.EnvironmentParameters.GetWithDefault("mode", 0f);
         }
         else
         {

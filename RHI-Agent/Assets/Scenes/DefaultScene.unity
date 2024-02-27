@@ -3121,11 +3121,11 @@ MonoBehaviour:
   conditionSetMe: 6
   visibleArmSetMe: 2
   stimulationSetMe: 2
-  modeSetMe: 2
+  modeSetMe: 3
   condition: 1
   visibleArm: 0
   stimulation: 0
-  mode: 1
+  mode: 0
   ballRange:
     b_min: 0
     b_max: 0

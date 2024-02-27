@@ -33,8 +33,9 @@ class Mode(enum.Enum):
     """
     Enumeration used to configure the type of mode used
     """
-    DataGeneration = 0.0
-    Inference = 1.0
+    Inference = 0.0
+    DataGeneration = 1.0
+    DataGenerationWithBall = 2.0
 
 
 class BallRange:
