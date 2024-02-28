@@ -90,11 +90,11 @@ class MainDataset(Dataset):
 class VAEDataset(Dataset):
     def __init__(self, X, Y) -> None:
         super().__init__()
-        self.X = torch.from_numpy(X).to(device)
-        self.Y = torch.from_numpy(Y).to(device)
+        self.X = torch.from_numpy(X)
+        self.Y = torch.from_numpy(Y)
 
     def __len__(self):
         return len(self.X)
 
     def __getitem__(self, idx):
-        return self.X[idx].unsqueeze(0), self.Y[idx].unsqueeze(0)
+        return self.X[idx].to(device).unsqueeze(0), self.Y[idx].unsqueeze(0)

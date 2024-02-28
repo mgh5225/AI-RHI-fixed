@@ -10,6 +10,7 @@
         "logvar",
         "mlagents",
         "NCHW",
-        "optim"
+        "optim",
+        "tensorboard"
     ]
 }

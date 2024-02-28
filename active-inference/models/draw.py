@@ -1,3 +1,5 @@
+import os
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.functional as F
@@ -75,7 +77,7 @@ class DrawModel(nn.Module):
 
         enc_state = Variable(torch.zeros(self.batch_size, self.enc_size))
         dec_state = Variable(torch.zeros(self.batch_size, self.dec_size))
-        for t in xrange(self.T):
+        for t in range(self.T):
             c_prev = Variable(torch.zeros(
                 self.batch_size, self.A * self.B)) if t == 0 else self.cs[t-1]
             x_hat = x - self.sigmoid(c_prev)     # 3
@@ -96,8 +98,8 @@ class DrawModel(nn.Module):
         x_recons = self.sigmoid(self.cs[-1])
         Lx = criterion(x_recons, x) * self.A * self.B
         Lz = 0
-        kl_terms = [0] * T
-        for t in xrange(self.T):
+        kl_terms = [0] * self.T
+        for t in range(self.T):
             mu_2 = self.mus[t] * self.mus[t]
             sigma_2 = self.sigmas[t] * self.sigmas[t]
             logsigma = self.logsigmas[t]
@@ -187,7 +189,7 @@ class DrawModel(nn.Module):
         dec_state = Variable(torch.zeros(
             self.batch_size, self.dec_size), volatile=True)
 
-        for t in xrange(self.T):
+        for t in range(self.T):
             c_prev = Variable(torch.zeros(
                 self.batch_size, self.A * self.B)) if t == 0 else self.cs[t - 1]
             z = self.normalSample()
@@ -200,7 +202,7 @@ class DrawModel(nn.Module):
         return imgs
 
     @staticmethod
-    def train_net(net: 'DrawModel', config: draw_configs, dataset):
+    def train_net(net: 'DrawModel', config: draw_configs, dataset, network_id: str):
         torch.cuda.empty_cache()
         writer = SummaryWriter("runs/" + config.network_name)
 
@@ -241,17 +243,17 @@ class DrawModel(nn.Module):
         epoch_loss = []
         val_loss = []
 
-        for epoch in range(max_epochs):
+        for epoch in range(config.epoch_num):
             cur_batch_loss = []
             cur_val_loss = []
 
             train_iter = iter(train_dataloader)
             test_iter = iter(test_dataloader)
 
-            for (x, _) in train_iter:
+            for (_, y) in train_iter:
                 loss = DrawModel.run_batch(
                     net,
-                    x,
+                    y,
                     True,
                     optimizer,
                     config
@@ -262,12 +264,12 @@ class DrawModel(nn.Module):
 
             epoch_loss = np.append(epoch_loss, [np.mean(cur_batch_loss)])
 
-            if epoch % 10 == 0 or epoch == (max_epochs - 1):
+            if epoch % 10 == 0 or epoch == (config.epoch_num - 1):
 
-                for (x, _) in test_iter:
+                for (_, y) in test_iter:
                     loss = DrawModel.run_batch(
                         net,
-                        x,
+                        y,
                         False,
                         optimizer,
                         config
@@ -287,15 +289,15 @@ class DrawModel(nn.Module):
                    DrawModel.SAVE_PATH + "/" + network_id + "/trained_network" + network_id + "final")
 
     @staticmethod
-    def run_batch(net: 'DrawModel', input_x: torch.Tensor, is_train: bool, optimizer: optim.Optimizer, config: draw_configs):
+    def run_batch(net: 'DrawModel', target_y: torch.Tensor, is_train: bool, optimizer: optim.Optimizer, config: draw_configs):
         optimizer.zero_grad()
 
-        bs = input_x.size()[0]
-        data = Variable(input_x).view(bs, -1)
+        bs = target_y.size()[0]
+        data = Variable(target_y).view(bs, -1)
 
         loss = net.loss(data)
 
-        if train:
+        if is_train:
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), config.clip)
             optimizer.step()

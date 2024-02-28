@@ -14,10 +14,14 @@ from utils.create_dataset import VAEDataset
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Device =", device)
 
+torch.set_default_dtype(torch.float64)
+
 config = draw_configs()
 data_id = "s2nr"
+model_id = "draw"
 
 X, Y, data_range = DataGeneration().load_data(data_id)
+A, B = Y.shape[1:]
 dataset = VAEDataset(X, Y)
 
 network = DrawModel(
@@ -37,4 +41,4 @@ if torch.cuda.is_available():
 if __name__ == '__main__':
     Path(network.SAVE_PATH + "/" + model_id +
          "/").mkdir(parents=True, exist_ok=True)
-    DrawModel.train_net(network, config, dataset)
+    DrawModel.train_net(network, config, dataset, model_id)

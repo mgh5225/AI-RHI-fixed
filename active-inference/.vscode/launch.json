@@ -6,37 +6,44 @@
     "configurations": [
         {
             "name": "Active Inference",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "model_operation.main_inference",
             "justMyCode": true
         },
         {
             "name": "Generate Data MLP",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "data_generation.main.main_generate_data",
             "justMyCode": true
         },
         {
             "name": "Generate Data VAE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "data_generation.vae.main_generate_data",
             "justMyCode": true
         },
         {
             "name": "Train MLP",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "model_training.main.main_train",
             "justMyCode": true
         },
         {
             "name": "Train VAE",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "model_training.vae.main_train",
+            "justMyCode": true
+        },
+        {
+            "name": "Train DRAW",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "model_training.draw.main_train",
             "justMyCode": true
         }
     ]
