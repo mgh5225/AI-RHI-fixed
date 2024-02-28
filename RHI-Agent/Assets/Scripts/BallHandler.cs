@@ -1,7 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.MLAgents;
+using System;
 
 // ===============================
 // AUTHOR: Thomas Rood
@@ -52,6 +53,12 @@ public class BallHandler : MonoBehaviour
         ball_r = this.transform.Find("ball_r").gameObject;
         ball_d = this.transform.Find("ball_d").gameObject;
 
+
+        ball_l.SetActive(false);
+        ball_c.SetActive(false);
+        ball_r.SetActive(false);
+        ball_d.SetActive(false);
+
         if (parameterScript.mode == Parameters.Mode.dataGenerationWithBall)
         {
             ball_l.SetActive(parameterScript.condition == Parameters.Condition.Left);
@@ -62,7 +69,7 @@ public class BallHandler : MonoBehaviour
             ball_c.GetComponent<Animator>().enabled = false;
             ball_r.GetComponent<Animator>().enabled = false;
         }
-        else
+        else if (parameterScript.mode == Parameters.Mode.inference)
         {
             ball_d.SetActive(true);
             SetRange(

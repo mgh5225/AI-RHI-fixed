@@ -1,8 +1,18 @@
+import collections
 import math
 
 import numpy as np
 import torch
-from torch.autograd.gradcheck import zero_gradients
+
+
+def zero_gradients(x):
+    if isinstance(x, torch.Tensor):
+        if x.grad is not None:
+            x.grad.detach_()
+            x.grad.zero_()
+    elif isinstance(x, collections.abc.Iterable):
+        for elem in x:
+            zero_gradients(elem)
 
 
 def min_max_norm(data, min, max):
